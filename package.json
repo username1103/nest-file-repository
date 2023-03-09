@@ -15,5 +15,17 @@
   "bugs": {
     "url": "https://github.com/username1103/nest-file-manager/issues"
   },
-  "homepage": "https://github.com/username1103/nest-file-manager#readme"
+  "homepage": "https://github.com/username1103/nest-file-manager#readme",
+  "dependencies": {
+    "@nestjs/common": "^9.3.9"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-import": "^2.27.5",
+    "prettier": "^2.8.4",
+    "typescript": "^4.9.5"
+  }
 }
