@@ -1,0 +1,19 @@
+{
+  "name": "nest-file-manager",
+  "version": "0.0.1",
+  "description": "nest-file-manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username1103/nest-file-manager.git"
+  },
+  "author": "username1103 <mikim961103@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/username1103/nest-file-manager/issues"
+  },
+  "homepage": "https://github.com/username1103/nest-file-manager#readme"
+}
