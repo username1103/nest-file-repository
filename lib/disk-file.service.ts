@@ -18,7 +18,7 @@ export class DiskFileService implements FileService {
 
   async save(file: File): Promise<string> {
     const filePath = path.join(
-      this.config.options.path || '',
+      this.config.options.path ?? '',
       `${this.nameGenerator.generate(file)}`,
     );
     try {
