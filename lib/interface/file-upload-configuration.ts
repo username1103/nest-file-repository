@@ -1,5 +1,7 @@
 import { UploadStrategy } from '../enum/upload-strategy';
 
+export const CONFIG = Symbol('CONFIG');
+
 export type FileUploadConfiguration =
   | DiskFileUploadConfiguration
   | S3FileUploadConfiguration;

@@ -1,10 +1,10 @@
-import { FileStore } from './file-store';
+import { FileService } from './file-service';
 import { S3FileUploadConfiguration } from './interface/file-upload-configuration';
 
-export class S3FileStore implements FileStore {
+export class S3FileService implements FileService {
   constructor(private readonly config: S3FileUploadConfiguration) {}
 
-  upload(file: any): Promise<string> {
+  save(file: any): Promise<string> {
     return Promise.resolve('');
   }
 }
