@@ -8,6 +8,7 @@ const config = {
   rootDir: 'lib',
   coverageDirectory: '../coverage',
   coverageReporters: ['lcov'],
+  collectCoverageFrom: ['**/*.(t|j)s', '!**/*.spec.ts'],
   setupFiles: ['../jest.setup.ts'],
 };
 
