@@ -1,7 +1,4 @@
-import {
-  FileUploadConfiguration,
-  S3FileUploadConfiguration,
-} from './interface/file-upload-configuration';
+import { FileUploadConfiguration } from './interface/file-upload-configuration';
 import { FileStore } from './file-store';
 import { UploadStrategy } from './enum/upload-strategy';
 import { DiskFileStore } from './disk-file-store';
