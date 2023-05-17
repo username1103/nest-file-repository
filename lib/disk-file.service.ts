@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import { FileService } from './file-service';
 import {
@@ -8,6 +8,9 @@ import {
 } from './interface/file-upload-configuration';
 import { File } from './File';
 import { NAME_GENERATOR, NameGenerator } from './interface/NameGenerator';
+import { Abortable } from 'events';
+import { Mode, ObjectEncodingOptions, OpenMode } from 'node:fs';
+import { AbortException } from './exception/abort.exception';
 
 @Injectable()
 export class DiskFileService implements FileService {
@@ -21,16 +24,26 @@ export class DiskFileService implements FileService {
       this.config.options.path ?? '',
       `${this.nameGenerator.generate(file)}`,
     );
-    try {
-      await new Promise((res, rej) => {
-        fs.writeFile(filePath, file.data, { flag: 'w' }, err => {
-          if (err) return rej(err);
 
-          res(undefined);
-        });
-      });
+    const options: ObjectEncodingOptions & {
+      mode?: Mode | undefined;
+      flag?: OpenMode | undefined;
+    } & Abortable = {
+      flag: 'w',
+    };
+
+    if (this.config.options.timeout !== undefined) {
+      options.signal = AbortSignal.timeout(this.config.options.timeout);
+    }
+
+    try {
+      await fs.writeFile(filePath, file.data, options);
     } catch (e) {
-      throw new Error(`파일 저장에 실패했습니다.${e}`);
+      if (e.name === 'AbortError') {
+        throw new AbortException();
+      }
+
+      throw e;
     }
 
     return filePath;
