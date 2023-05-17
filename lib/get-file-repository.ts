@@ -1,15 +1,18 @@
 import { FileUploadConfiguration } from './interface/file-upload-configuration';
-import { FileStore } from './file-store';
+import { FileRepository } from './file-repository';
 import { UploadStrategy } from './enum/upload-strategy';
-import { DiskFileStore } from './disk-file-store';
-import { S3FileStore } from './s3-file-store';
+import { DiskFileRepository } from './disk-file-repository';
+import { S3FileRepository } from './s3-file-repository';
+import { Type } from '@nestjs/common';
 
-export const getImageStore = (config: FileUploadConfiguration): FileStore => {
+export const getFileRepository = (
+  config: FileUploadConfiguration,
+): Type<FileRepository> => {
   switch (config.strategy) {
     case UploadStrategy.DISK:
-      return new DiskFileStore(config);
+      return DiskFileRepository;
     case UploadStrategy.S3:
-      return new S3FileStore(config);
+      return S3FileRepository;
     default:
       return unknownUploadStrategy(config);
   }

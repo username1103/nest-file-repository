@@ -1,5 +1,7 @@
 import { UploadStrategy } from '../enum/upload-strategy';
 
+export const CONFIG = Symbol('CONFIG');
+
 export type FileUploadConfiguration =
   | DiskFileUploadConfiguration
   | S3FileUploadConfiguration;
@@ -7,7 +9,7 @@ export type FileUploadConfiguration =
 export interface S3FileUploadConfiguration {
   strategy: UploadStrategy.S3;
 
-  options: {
+  options: CommonOptions & {
     region: string;
     credentials: {
       secretAccessKey: string;
@@ -15,7 +17,6 @@ export interface S3FileUploadConfiguration {
     };
     bucket: string;
     acl: string;
-    path?: string;
     endPoint?: string;
     forcePathStyle?: boolean;
   };
@@ -24,7 +25,10 @@ export interface S3FileUploadConfiguration {
 export interface DiskFileUploadConfiguration {
   strategy: UploadStrategy.DISK;
 
-  options: {
-    path?: string;
-  };
+  options?: CommonOptions;
+}
+
+export interface CommonOptions {
+  path?: string;
+  timeout?: number;
 }
