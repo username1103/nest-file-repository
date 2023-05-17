@@ -1,0 +1,10 @@
+services:
+  localstack:
+    image: localstack/localstack:0.14.1
+    container_name: localstack
+    ports:
+      - "4566:4566"
+    volumes:
+      - "./scripts/localstack-init:/docker-entrypoint-initaws.d"
+    environment:
+      - SERVICES=s3
