@@ -1,0 +1,36 @@
+parser: "@typescript-eslint/parser"
+parserOptions:
+  project: 'tsconfig.json'
+  sourceType: 'module'
+plugins:
+  - "@typescript-eslint"
+  - 'import'
+extends:
+  - "plugin:@typescript-eslint/recommended"
+  - "plugin:@typescript-eslint/eslint-recommended"
+  - 'plugin:prettier/recommended'
+root: true
+env:
+  node: true
+  jest: true
+rules:
+  '@typescript-eslint/interface-name-prefix': 'off'
+  '@typescript-eslint/explicit-function-return-type': 'off'
+  '@typescript-eslint/no-explicit-any': 'off'
+  '@typescript-eslint/no-use-before-define': 'off'
+  '@typescript-eslint/no-non-null-assertion': 'off'
+  '@typescript-eslint/no-unused-vars': 'off'
+  'import/order': [
+    'error',
+    {
+      groups: [ 'builtin', 'external', [ 'parent', 'sibling' ], 'index' ],
+      alphabetize: {
+        order: 'asc',
+        caseInsensitive: true,
+      },
+      'newlines-between': 'always',
+    },
+  ]
+  'import/newline-after-import': ['error', { 'count': 1 }]
+
+

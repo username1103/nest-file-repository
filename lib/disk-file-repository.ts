@@ -1,22 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Abortable } from 'events';
 import * as fs from 'fs/promises';
+import { Mode, ObjectEncodingOptions, OpenMode } from 'node:fs';
 import * as path from 'path';
+
+import { Inject, Injectable } from '@nestjs/common';
+
+import { AbortException } from './exception/abort.exception';
+import { File } from './File';
 import { FileRepository } from './file-repository';
 import {
   CONFIG,
   DiskFileUploadConfiguration,
 } from './interface/file-upload-configuration';
-import { File } from './File';
-import { NAME_GENERATOR, NameGenerator } from './interface/NameGenerator';
-import { Abortable } from 'events';
-import { Mode, ObjectEncodingOptions, OpenMode } from 'node:fs';
-import { AbortException } from './exception/abort.exception';
 
 @Injectable()
 export class DiskFileRepository implements FileRepository {
   constructor(
     @Inject(CONFIG) private readonly config: DiskFileUploadConfiguration,
-    @Inject(NAME_GENERATOR) private readonly nameGenerator: NameGenerator,
   ) {}
 
   async save(file: File): Promise<string> {

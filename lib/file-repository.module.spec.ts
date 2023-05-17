@@ -1,13 +1,14 @@
-import { FileRepositoryModule } from './file-repository.module';
 import { Test } from '@nestjs/testing';
+
+import { DiskFileRepository } from './disk-file-repository';
 import { UploadStrategy } from './enum/upload-strategy';
 import { FileRepository } from './file-repository';
-import { DiskFileRepository } from './disk-file-repository';
-import { NAME_GENERATOR } from './interface/NameGenerator';
+import { FileRepositoryModule } from './file-repository.module';
 import {
   CONFIG,
   DiskFileUploadConfiguration,
 } from './interface/file-upload-configuration';
+import { NAME_GENERATOR } from './interface/NameGenerator';
 import { UuidNameGenerator } from './util/uuid-name-generator';
 
 describe('FileRepositoryModule', () => {

@@ -1,10 +1,11 @@
+import { DynamicModule } from '@nestjs/common';
+
+import { FileRepository } from './file-repository';
+import { getFileRepository } from './get-file-repository';
 import {
   CONFIG,
   FileUploadConfiguration,
 } from './interface/file-upload-configuration';
-import { DynamicModule } from '@nestjs/common';
-import { FileRepository } from './file-repository';
-import { getFileRepository } from './get-file-repository';
 import { NAME_GENERATOR } from './interface/NameGenerator';
 import { UuidNameGenerator } from './util/uuid-name-generator';
 

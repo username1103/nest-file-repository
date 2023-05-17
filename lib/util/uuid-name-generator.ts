@@ -1,7 +1,9 @@
 import { randomUUID } from 'crypto';
-import { NameGenerator } from '../interface/NameGenerator';
-import { File } from '../File';
+
 import { Injectable } from '@nestjs/common';
+
+import { File } from '../File';
+import { NameGenerator } from '../interface/NameGenerator';
 
 @Injectable()
 export class UuidNameGenerator implements NameGenerator {
