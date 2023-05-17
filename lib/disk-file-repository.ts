@@ -20,7 +20,7 @@ export class DiskFileRepository implements FileRepository {
   ) {}
 
   async save(file: File): Promise<string> {
-    const filePath = path.join(this.config.options.path ?? '', file.filename);
+    const filePath = path.join(this.config.options?.path ?? '', file.filename);
 
     const options: ObjectEncodingOptions & {
       mode?: Mode | undefined;
@@ -29,7 +29,7 @@ export class DiskFileRepository implements FileRepository {
       flag: 'w',
     };
 
-    if (this.config.options.timeout !== undefined) {
+    if (this.config.options?.timeout !== undefined) {
       options.signal = AbortSignal.timeout(this.config.options.timeout);
     }
 

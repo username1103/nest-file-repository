@@ -27,6 +27,26 @@ describe('DiskFileService', () => {
     await fs.unlink(result);
   });
 
+  it('save file in disk if config doesnt have path', async () => {
+    // given
+    const file = new File('test.txt', Buffer.from('hello'));
+    const diskFileStore = new DiskFileRepository(
+      {
+        strategy: UploadStrategy.DISK,
+      },
+      new UuidNameGenerator(),
+    );
+
+    // when
+    const result = await diskFileStore.save(file);
+
+    // then
+    const buffer = await fs.readFile(result);
+    expect(buffer.toString()).toBe('hello');
+
+    await fs.unlink(result);
+  });
+
   it('throw timeout error if timeout', async () => {
     // given
     const data = await fs.readFile('./sample.jpeg');

@@ -25,7 +25,7 @@ export interface S3FileUploadConfiguration {
 export interface DiskFileUploadConfiguration {
   strategy: UploadStrategy.DISK;
 
-  options: CommonOptions;
+  options?: CommonOptions;
 }
 
 export interface CommonOptions {
