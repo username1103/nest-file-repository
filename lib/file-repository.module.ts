@@ -3,19 +3,19 @@ import {
   FileUploadConfiguration,
 } from './interface/file-upload-configuration';
 import { DynamicModule } from '@nestjs/common';
-import { FileService } from './file-service';
-import { getImageService } from './get-image-service';
+import { FileRepository } from './file-repository';
+import { getFileRepository } from './get-file-repository';
 import { NAME_GENERATOR } from './interface/NameGenerator';
 import { UuidNameGenerator } from './util/uuid-name-generator';
 
-export class FileModule {
+export class FileRepositoryModule {
   static register(config: FileUploadConfiguration): DynamicModule {
     return {
-      module: FileModule,
+      module: FileRepositoryModule,
       providers: [
         {
-          provide: FileService,
-          useClass: getImageService(config),
+          provide: FileRepository,
+          useClass: getFileRepository(config),
         },
         {
           provide: CONFIG,
@@ -26,7 +26,7 @@ export class FileModule {
           useClass: UuidNameGenerator,
         },
       ],
-      exports: [FileService],
+      exports: [FileRepository],
     };
   }
 }

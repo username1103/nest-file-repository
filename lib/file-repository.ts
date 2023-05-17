@@ -1,5 +1,5 @@
 import { File } from './File';
 
-export abstract class FileService {
+export abstract class FileRepository {
   abstract save(file: File): Promise<string>;
 }

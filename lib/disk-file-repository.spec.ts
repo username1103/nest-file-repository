@@ -1,5 +1,5 @@
 import { File } from './File';
-import { DiskFileService } from './disk-file.service';
+import { DiskFileRepository } from './disk-file-repository';
 import { UploadStrategy } from './enum/upload-strategy';
 import { UuidNameGenerator } from './util/uuid-name-generator';
 import * as fs from 'fs/promises';
@@ -9,7 +9,7 @@ describe('DiskFileService', () => {
   it('save file in disk', async () => {
     // given
     const file = new File('test.txt', Buffer.from('hello'));
-    const diskFileStore = new DiskFileService(
+    const diskFileStore = new DiskFileRepository(
       {
         strategy: UploadStrategy.DISK,
         options: { path: '.' },
@@ -31,7 +31,7 @@ describe('DiskFileService', () => {
     // given
     const data = await fs.readFile('./sample.jpeg');
     const file = new File('test.jpg', data);
-    const diskFileStore = new DiskFileService(
+    const diskFileStore = new DiskFileRepository(
       {
         strategy: UploadStrategy.DISK,
         options: { path: '.', timeout: 0 },
