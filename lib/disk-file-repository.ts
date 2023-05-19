@@ -23,8 +23,8 @@ export class DiskFileRepository implements FileRepository {
     const filePath = path.join(this.config.options?.path ?? '', file.filename);
 
     const options: ObjectEncodingOptions & {
-      mode?: Mode | undefined;
-      flag?: OpenMode | undefined;
+      mode?: Mode;
+      flag?: OpenMode;
     } & Abortable = {
       flag: 'w',
     };
