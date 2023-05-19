@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/username1103/nest-file-manager#readme",
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.332.0",
     "@nestjs/common": "^9.4.1",
     "@nestjs/core": "^9.4.1",
     "@nestjs/testing": "^9.4.1",
