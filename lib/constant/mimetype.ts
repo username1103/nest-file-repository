@@ -12,6 +12,7 @@ export const MIMETYPE = {
   WEBP: 'image/webp',
   GIF: 'image/gif',
   SVG: 'image/svg+xml',
-};
+  APPLICATION_OCTET_STREAM: 'application/octet-stream',
+} as const;
 
 export type Mimetype = (typeof MIMETYPE)[keyof typeof MIMETYPE];

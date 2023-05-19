@@ -1,4 +1,4 @@
-const EXTENSION = {
+export const EXTENSION = {
   TEXT: '.txt',
   HTML: '.html',
   CSS: '.css',
@@ -13,4 +13,7 @@ const EXTENSION = {
   WEBP: '.webp',
   GIF: '.gif',
   SVG: '.svg',
-};
+  EMPTY: '',
+} as const;
+
+export type Extension = (typeof EXTENSION)[keyof typeof EXTENSION];
