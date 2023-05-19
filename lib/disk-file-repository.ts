@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { Inject, Injectable } from '@nestjs/common';
 
-import { AbortException } from './exception/abort.exception';
+import { TimeoutException } from './exception/timeout.exception';
 import { File } from './File';
 import { FileRepository } from './file-repository';
 import {
@@ -29,7 +29,7 @@ export class DiskFileRepository implements FileRepository {
       flag: 'w',
     };
 
-    if (this.config.options?.timeout !== undefined) {
+    if (this.config.options?.timeout) {
       options.signal = AbortSignal.timeout(this.config.options.timeout);
     }
 
@@ -37,7 +37,9 @@ export class DiskFileRepository implements FileRepository {
       await fs.writeFile(filePath, file.data, options);
     } catch (e) {
       if (e.name === 'AbortError') {
-        throw new AbortException();
+        throw new TimeoutException(
+          `raise timeout: ${this.config.options?.timeout}ms`,
+        );
       }
 
       throw e;

@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 
 import { DiskFileRepository } from './disk-file-repository';
 import { UploadStrategy } from './enum/upload-strategy';
-import { AbortException } from './exception/abort.exception';
+import { TimeoutException } from './exception/timeout.exception';
 import { File } from './File';
 
 describe('DiskFileService', () => {
@@ -41,18 +41,18 @@ describe('DiskFileService', () => {
     await fs.unlink(result);
   });
 
-  it('throw timeout error if timeout', async () => {
+  it('throw timeout error if times out', async () => {
     // given
     const data = await fs.readFile('./sample.jpeg');
     const file = new File('test.jpg', data);
     const diskFileStore = new DiskFileRepository({
       strategy: UploadStrategy.DISK,
-      options: { path: '.', timeout: 0 },
+      options: { path: '.', timeout: 1 },
     });
 
     // when, then
     await expect(() => diskFileStore.save(file)).rejects.toThrow(
-      AbortException,
+      TimeoutException,
     );
   });
 });
