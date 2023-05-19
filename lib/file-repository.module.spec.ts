@@ -8,7 +8,7 @@ import {
   CONFIG,
   DiskFileUploadConfiguration,
 } from './interface/file-upload-configuration';
-import { NAME_GENERATOR } from './interface/NameGenerator';
+import { NAME_GENERATOR } from './interface/name-generator';
 import { UuidNameGenerator } from './util/uuid-name-generator';
 
 describe('FileRepositoryModule', () => {

@@ -6,8 +6,6 @@ import {
   CONFIG,
   FileUploadConfiguration,
 } from './interface/file-upload-configuration';
-import { NAME_GENERATOR } from './interface/NameGenerator';
-import { UuidNameGenerator } from './util/uuid-name-generator';
 
 export class FileRepositoryModule {
   static register(config: FileUploadConfiguration): DynamicModule {
@@ -21,10 +19,6 @@ export class FileRepositoryModule {
         {
           provide: CONFIG,
           useValue: config,
-        },
-        {
-          provide: NAME_GENERATOR,
-          useClass: UuidNameGenerator,
         },
       ],
       exports: [FileRepository],
