@@ -7,7 +7,7 @@ export type FileUploadConfiguration =
   | S3FileUploadConfiguration
   | MemoryFileUploadConfiguration;
 
-export interface S3FileUploadConfiguration {
+export interface S3FileUploadConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.S3;
 
   options: CommonOptions & {
@@ -23,13 +23,13 @@ export interface S3FileUploadConfiguration {
   };
 }
 
-export interface DiskFileUploadConfiguration {
+export interface DiskFileUploadConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.DISK;
 
   options?: CommonOptions;
 }
 
-export interface MemoryFileUploadConfiguration {
+export interface MemoryFileUploadConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.MEMORY;
 
   options?: CommonOptions;
@@ -43,4 +43,8 @@ export interface CommonOptions {
    * 0 disables the timeout.
    */
   timeout?: number;
+}
+
+export interface CommonConfiguration {
+  name?: string | symbol;
 }
