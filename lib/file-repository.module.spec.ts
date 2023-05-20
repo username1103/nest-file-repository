@@ -7,9 +7,11 @@ import { FileRepositoryModule } from './file-repository.module';
 import {
   CONFIG,
   DiskFileUploadConfiguration,
+  MemoryFileUploadConfiguration,
   S3FileUploadConfiguration,
 } from './interface/file-upload-configuration';
 import { MIMETYPE_EXTENSION_CONVERTER } from './interface/mimetype-extension-converter';
+import { MemoryFileRepository } from './memory-file-repository';
 import { S3FileRepository } from './s3-file-repository';
 import { DefaultMimetypeExtensionConverter } from './util/default-mimetype-extension-converter';
 
@@ -62,5 +64,23 @@ describe('FileRepositoryModule', () => {
       DefaultMimetypeExtensionConverter,
     );
     expect(config).toBe(s3Config);
+  });
+
+  it('make s3 file repository by s3 config', async () => {
+    // given
+    const memoryConfig: MemoryFileUploadConfiguration = {
+      strategy: UploadStrategy.MEMORY,
+    };
+    const module = await Test.createTestingModule({
+      imports: [FileRepositoryModule.register(memoryConfig)],
+    }).compile();
+
+    // when
+    const fileService = module.get(FileRepository);
+    const config = module.get(CONFIG);
+
+    // then
+    expect(fileService).toBeInstanceOf(MemoryFileRepository);
+    expect(config).toBe(memoryConfig);
   });
 });
