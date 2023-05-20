@@ -4,7 +4,8 @@ export const CONFIG = Symbol('CONFIG');
 
 export type FileUploadConfiguration =
   | DiskFileUploadConfiguration
-  | S3FileUploadConfiguration;
+  | S3FileUploadConfiguration
+  | MemoryFileUploadConfiguration;
 
 export interface S3FileUploadConfiguration {
   strategy: UploadStrategy.S3;
@@ -24,6 +25,12 @@ export interface S3FileUploadConfiguration {
 
 export interface DiskFileUploadConfiguration {
   strategy: UploadStrategy.DISK;
+
+  options?: CommonOptions;
+}
+
+export interface MemoryFileUploadConfiguration {
+  strategy: UploadStrategy.MEMORY;
 
   options?: CommonOptions;
 }
