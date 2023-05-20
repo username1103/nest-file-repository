@@ -2,15 +2,25 @@
   "name": "nest-file-manager",
   "version": "0.0.1",
   "description": "nest-file-manager",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "build": "tsc",
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/username1103/nest-file-manager.git"
   },
+  "maintainers": [
+    {
+      "name": "username1103",
+      "email": "mikim961103@gmail.com",
+      "url": "https://github.com/username1103"
+    }
+  ],
   "author": "username1103 <mikim961103@gmail.com>",
   "license": "ISC",
   "bugs": {

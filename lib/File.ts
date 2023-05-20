@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { Mimetype } from './constant/mimetype';
+import { Mimetype } from './constant';
 
 export class File {
   filename: string;

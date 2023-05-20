@@ -5,13 +5,13 @@ import * as path from 'path';
 
 import { Inject, Injectable } from '@nestjs/common';
 
+import { TimeoutException } from './exception';
 import { FileRepository } from './file-repository';
-import { TimeoutException } from '../exception/timeout.exception';
-import { File } from '../File';
 import {
   CONFIG,
   DiskFileUploadConfiguration,
-} from '../interface/file-upload-configuration';
+} from './interface/file-upload-configuration';
+import { File } from '../File';
 
 @Injectable()
 export class DiskFileRepository implements FileRepository {
@@ -40,7 +40,7 @@ export class DiskFileRepository implements FileRepository {
 
       await fs.writeFile(filePath, file.data, options);
     } catch (e) {
-      if (e.name === 'AbortError') {
+      if ((e as any).name === 'AbortError') {
         throw new TimeoutException(
           `raise timeout: ${this.config.options?.timeout}ms`,
         );

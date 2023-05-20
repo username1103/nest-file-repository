@@ -4,17 +4,19 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import { Inject, Injectable } from '@nestjs/common';
 
+import {
+  TimeoutException,
+  SignatureDoesNotMatchedException,
+  NotAllowedAclException,
+  NoSuchBucketException,
+  InvalidAccessKeyIdException,
+} from './exception';
 import { FileRepository } from './file-repository';
-import { InvalidAccessKeyIdException } from '../exception/invalid-access-key-id.exception';
-import { NoSuchBucketException } from '../exception/no-such-bucket.exception';
-import { NotAllowedAclException } from '../exception/not-allowed-acl.exception';
-import { SignatureDoesNotMatchedException } from '../exception/signature-does-not-matched.exception';
-import { TimeoutException } from '../exception/timeout.exception';
-import { File } from '../File';
 import {
   CONFIG,
   S3FileUploadConfiguration,
-} from '../interface/file-upload-configuration';
+} from './interface/file-upload-configuration';
+import { File } from '../File';
 
 @Injectable()
 export class S3FileRepository implements FileRepository {
@@ -50,6 +52,10 @@ export class S3FileRepository implements FileRepository {
         }),
       );
     } catch (e) {
+      if (!(e instanceof Error)) {
+        throw e;
+      }
+
       if (e.name === 'TimeoutError') {
         throw new TimeoutException(
           `raise timeout: ${this.config.options.timeout}ms`,

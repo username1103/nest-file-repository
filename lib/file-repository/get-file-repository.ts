@@ -2,10 +2,10 @@ import { Type } from '@nestjs/common';
 
 import { DiskFileRepository } from './disk-file-repository';
 import { FileRepository } from './file-repository';
+import { FileUploadConfiguration } from './interface/file-upload-configuration';
 import { MemoryFileRepository } from './memory-file-repository';
 import { S3FileRepository } from './s3-file-repository';
-import { UploadStrategy } from '../enum/upload-strategy';
-import { FileUploadConfiguration } from '../interface/file-upload-configuration';
+import { UploadStrategy } from '../enum';
 
 export const getFileRepository = (
   config: FileUploadConfiguration,

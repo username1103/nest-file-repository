@@ -3,11 +3,11 @@ import path from 'path';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { FileRepository } from './file-repository';
-import { File } from '../File';
 import {
   CONFIG,
   MemoryFileUploadConfiguration,
-} from '../interface/file-upload-configuration';
+} from './interface/file-upload-configuration';
+import { File } from '../File';
 
 @Injectable()
 export class MemoryFileRepository implements FileRepository {
