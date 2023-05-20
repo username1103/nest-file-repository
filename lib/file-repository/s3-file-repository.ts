@@ -4,14 +4,14 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { NoSuchBucketException } from './exception/no-such-bucket.exception';
-import { TimeoutException } from './exception/timeout.exception';
-import { File } from './File';
 import { FileRepository } from './file-repository';
+import { NoSuchBucketException } from '../exception/no-such-bucket.exception';
+import { TimeoutException } from '../exception/timeout.exception';
+import { File } from '../File';
 import {
   CONFIG,
   S3FileUploadConfiguration,
-} from './interface/file-upload-configuration';
+} from '../interface/file-upload-configuration';
 
 @Injectable()
 export class S3FileRepository implements FileRepository {

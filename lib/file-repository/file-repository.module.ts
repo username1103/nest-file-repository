@@ -5,7 +5,7 @@ import { getFileRepository } from './get-file-repository';
 import {
   CONFIG,
   FileUploadConfiguration,
-} from './interface/file-upload-configuration';
+} from '../interface/file-upload-configuration';
 
 export class FileRepositoryModule {
   static register(config: FileUploadConfiguration): DynamicModule {

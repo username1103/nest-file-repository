@@ -1,17 +1,17 @@
 import { Test } from '@nestjs/testing';
 
 import { DiskFileRepository } from './disk-file-repository';
-import { UploadStrategy } from './enum/upload-strategy';
 import { FileRepository } from './file-repository';
 import { FileRepositoryModule } from './file-repository.module';
+import { MemoryFileRepository } from './memory-file-repository';
+import { S3FileRepository } from './s3-file-repository';
+import { UploadStrategy } from '../enum/upload-strategy';
 import {
   CONFIG,
   DiskFileUploadConfiguration,
   MemoryFileUploadConfiguration,
   S3FileUploadConfiguration,
-} from './interface/file-upload-configuration';
-import { MemoryFileRepository } from './memory-file-repository';
-import { S3FileRepository } from './s3-file-repository';
+} from '../interface/file-upload-configuration';
 
 describe('FileRepositoryModule', () => {
   it('make disk file repository by disk config', async () => {
