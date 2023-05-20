@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 
 import { DiskFileRepository } from './disk-file-repository';
-import { UploadStrategy } from '../enum/upload-strategy';
-import { TimeoutException } from '../exception/timeout.exception';
+import { TimeoutException } from './exception';
+import { UploadStrategy } from '../enum';
 import { File } from '../File';
 
 describe('DiskFileService', () => {

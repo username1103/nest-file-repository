@@ -1,9 +1,8 @@
+import { TimeoutException, NoSuchBucketException } from './exception';
+import { S3FileUploadConfiguration } from './interface/file-upload-configuration';
 import { S3FileRepository } from './s3-file-repository';
-import { UploadStrategy } from '../enum/upload-strategy';
-import { NoSuchBucketException } from '../exception/no-such-bucket.exception';
-import { TimeoutException } from '../exception/timeout.exception';
+import { UploadStrategy } from '../enum';
 import { File } from '../File';
-import { S3FileUploadConfiguration } from '../interface/file-upload-configuration';
 
 describe('S3FileRepository', () => {
   it('upload file in s3', async () => {

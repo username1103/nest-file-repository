@@ -1,5 +1,5 @@
-import { UploadStrategy } from '../enum/upload-strategy';
-import { acl } from '../file-repository/constant';
+import { UploadStrategy } from '../../enum';
+import { acl } from '../constant';
 
 export const CONFIG = Symbol('CONFIG');
 

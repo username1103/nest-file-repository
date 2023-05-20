@@ -4,15 +4,15 @@ import { DEFAULT_ALIAS } from './constant';
 import { DiskFileRepository } from './disk-file-repository';
 import { FileRepository } from './file-repository';
 import { FileRepositoryModule } from './file-repository.module';
-import { MemoryFileRepository } from './memory-file-repository';
-import { S3FileRepository } from './s3-file-repository';
-import { UploadStrategy } from '../enum/upload-strategy';
 import {
   CONFIG,
   DiskFileUploadConfiguration,
   MemoryFileUploadConfiguration,
   S3FileUploadConfiguration,
-} from '../interface/file-upload-configuration';
+} from './interface/file-upload-configuration';
+import { MemoryFileRepository } from './memory-file-repository';
+import { S3FileRepository } from './s3-file-repository';
+import { UploadStrategy } from '../enum';
 
 describe('FileRepositoryModule', () => {
   it('make disk file repository by disk config', async () => {
