@@ -12,18 +12,12 @@ import {
   CONFIG,
   S3FileUploadConfiguration,
 } from './interface/file-upload-configuration';
-import {
-  MIMETYPE_EXTENSION_CONVERTER,
-  MimetypeExtensionConverter,
-} from './interface/mimetype-extension-converter';
 
 @Injectable()
 export class S3FileRepository implements FileRepository {
   private readonly client: S3Client;
   constructor(
     @Inject(CONFIG) private readonly config: S3FileUploadConfiguration,
-    @Inject(MIMETYPE_EXTENSION_CONVERTER)
-    private readonly mimetypeExtensionConverter: MimetypeExtensionConverter,
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
@@ -49,9 +43,7 @@ export class S3FileRepository implements FileRepository {
           Key: filePath,
           Body: file.data,
           ACL: this.config.options.acl,
-          ContentType:
-            file.mimetype ??
-            this.mimetypeExtensionConverter.getMimeType(file.extension),
+          ContentType: file.mimetype,
         }),
       );
     } catch (e) {
