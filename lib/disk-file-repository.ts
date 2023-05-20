@@ -34,6 +34,10 @@ export class DiskFileRepository implements FileRepository {
     }
 
     try {
+      if (this.config.options?.path) {
+        await fs.mkdir(this.config.options?.path, { recursive: true });
+      }
+
       await fs.writeFile(filePath, file.data, options);
     } catch (e) {
       if (e.name === 'AbortError') {

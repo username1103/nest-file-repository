@@ -11,13 +11,32 @@ describe('DiskFileService', () => {
     const file = new File('test.txt', Buffer.from('hello'));
     const diskFileStore = new DiskFileRepository({
       strategy: UploadStrategy.DISK,
-      options: { path: '.' },
+      options: { path: './sample/sample-nested' },
     });
 
     // when
     const result = await diskFileStore.save(file);
 
     // then
+    expect(result).toBe('sample/sample-nested/test.txt');
+    const buffer = await fs.readFile(result);
+    expect(buffer.toString()).toBe('hello');
+
+    await fs.unlink(result);
+  });
+
+  it('save file in disk when no path in options of config', async () => {
+    // given
+    const file = new File('test.txt', Buffer.from('hello'));
+    const diskFileStore = new DiskFileRepository({
+      strategy: UploadStrategy.DISK,
+    });
+
+    // when
+    const result = await diskFileStore.save(file);
+
+    // then
+    expect(result).toBe('test.txt');
     const buffer = await fs.readFile(result);
     expect(buffer.toString()).toBe('hello');
 
@@ -35,6 +54,7 @@ describe('DiskFileService', () => {
     const result = await diskFileStore.save(file);
 
     // then
+    expect(result).toBe('test.txt');
     const buffer = await fs.readFile(result);
     expect(buffer.toString()).toBe('hello');
 
