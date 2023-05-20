@@ -1,7 +1,7 @@
 {
   "name": "nest-file-manager",
   "version": "0.0.1",
-  "description": "nest-file-manager",
+  "description": "file manager for Nest framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
