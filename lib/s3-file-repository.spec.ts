@@ -4,7 +4,6 @@ import { TimeoutException } from './exception/timeout.exception';
 import { File } from './File';
 import { S3FileUploadConfiguration } from './interface/file-upload-configuration';
 import { S3FileRepository } from './s3-file-repository';
-import { DefaultMimetypeExtensionConverter } from './util/default-mimetype-extension-converter';
 
 describe('S3FileRepository', () => {
   it('upload file in s3', async () => {
@@ -24,10 +23,7 @@ describe('S3FileRepository', () => {
         acl: 'public-read',
       },
     };
-    const s3FileRepository = new S3FileRepository(
-      config,
-      new DefaultMimetypeExtensionConverter(),
-    );
+    const s3FileRepository = new S3FileRepository(config);
 
     const file = new File('file.txt', Buffer.from('hello'));
 
@@ -56,10 +52,7 @@ describe('S3FileRepository', () => {
         timeout: 1,
       },
     };
-    const s3FileRepository = new S3FileRepository(
-      config,
-      new DefaultMimetypeExtensionConverter(),
-    );
+    const s3FileRepository = new S3FileRepository(config);
 
     const file = new File('file.jpeg', Buffer.from('hello'));
 
@@ -86,10 +79,7 @@ describe('S3FileRepository', () => {
         acl: 'public-read',
       },
     };
-    const s3FileRepository = new S3FileRepository(
-      config,
-      new DefaultMimetypeExtensionConverter(),
-    );
+    const s3FileRepository = new S3FileRepository(config);
 
     const file = new File('file.jpeg', Buffer.from('hello'));
 
