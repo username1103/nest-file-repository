@@ -30,5 +30,10 @@ export interface DiskFileUploadConfiguration {
 
 export interface CommonOptions {
   path?: string;
+
+  /**
+   * The number of milliseconds a request can take before automatically being terminated.
+   * 0 disables the timeout.
+   */
   timeout?: number;
 }

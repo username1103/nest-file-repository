@@ -1,5 +1,5 @@
-import { File } from '../File';
 import { UuidNameGenerator } from './uuid-name-generator';
+import { File } from '../File';
 
 describe('UuidNameGenerator', () => {
   it('generate uuid name with file extension', async () => {

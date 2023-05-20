@@ -1,35 +1,35 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Abortable } from 'events';
 import * as fs from 'fs/promises';
+import { Mode, ObjectEncodingOptions, OpenMode } from 'node:fs';
 import * as path from 'path';
+
+import { Inject, Injectable } from '@nestjs/common';
+
+import { TimeoutException } from './exception/timeout.exception';
+import { File } from './File';
 import { FileRepository } from './file-repository';
 import {
   CONFIG,
   DiskFileUploadConfiguration,
 } from './interface/file-upload-configuration';
-import { File } from './File';
-import { NAME_GENERATOR, NameGenerator } from './interface/NameGenerator';
-import { Abortable } from 'events';
-import { Mode, ObjectEncodingOptions, OpenMode } from 'node:fs';
-import { AbortException } from './exception/abort.exception';
 
 @Injectable()
 export class DiskFileRepository implements FileRepository {
   constructor(
     @Inject(CONFIG) private readonly config: DiskFileUploadConfiguration,
-    @Inject(NAME_GENERATOR) private readonly nameGenerator: NameGenerator,
   ) {}
 
   async save(file: File): Promise<string> {
     const filePath = path.join(this.config.options?.path ?? '', file.filename);
 
     const options: ObjectEncodingOptions & {
-      mode?: Mode | undefined;
-      flag?: OpenMode | undefined;
+      mode?: Mode;
+      flag?: OpenMode;
     } & Abortable = {
       flag: 'w',
     };
 
-    if (this.config.options?.timeout !== undefined) {
+    if (this.config.options?.timeout) {
       options.signal = AbortSignal.timeout(this.config.options.timeout);
     }
 
@@ -37,7 +37,9 @@ export class DiskFileRepository implements FileRepository {
       await fs.writeFile(filePath, file.data, options);
     } catch (e) {
       if (e.name === 'AbortError') {
-        throw new AbortException();
+        throw new TimeoutException(
+          `raise timeout: ${this.config.options?.timeout}ms`,
+        );
       }
 
       throw e;

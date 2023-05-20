@@ -1,21 +1,18 @@
-import { File } from './File';
+import * as fs from 'fs/promises';
+
 import { DiskFileRepository } from './disk-file-repository';
 import { UploadStrategy } from './enum/upload-strategy';
-import { UuidNameGenerator } from './util/uuid-name-generator';
-import * as fs from 'fs/promises';
-import { AbortException } from './exception/abort.exception';
+import { TimeoutException } from './exception/timeout.exception';
+import { File } from './File';
 
 describe('DiskFileService', () => {
   it('save file in disk', async () => {
     // given
     const file = new File('test.txt', Buffer.from('hello'));
-    const diskFileStore = new DiskFileRepository(
-      {
-        strategy: UploadStrategy.DISK,
-        options: { path: '.' },
-      },
-      new UuidNameGenerator(),
-    );
+    const diskFileStore = new DiskFileRepository({
+      strategy: UploadStrategy.DISK,
+      options: { path: '.' },
+    });
 
     // when
     const result = await diskFileStore.save(file);
@@ -30,12 +27,9 @@ describe('DiskFileService', () => {
   it('save file in disk if config doesnt have path', async () => {
     // given
     const file = new File('test.txt', Buffer.from('hello'));
-    const diskFileStore = new DiskFileRepository(
-      {
-        strategy: UploadStrategy.DISK,
-      },
-      new UuidNameGenerator(),
-    );
+    const diskFileStore = new DiskFileRepository({
+      strategy: UploadStrategy.DISK,
+    });
 
     // when
     const result = await diskFileStore.save(file);
@@ -47,21 +41,18 @@ describe('DiskFileService', () => {
     await fs.unlink(result);
   });
 
-  it('throw timeout error if timeout', async () => {
+  it('throw timeout error if times out', async () => {
     // given
     const data = await fs.readFile('./sample.jpeg');
     const file = new File('test.jpg', data);
-    const diskFileStore = new DiskFileRepository(
-      {
-        strategy: UploadStrategy.DISK,
-        options: { path: '.', timeout: 0 },
-      },
-      new UuidNameGenerator(),
-    );
+    const diskFileStore = new DiskFileRepository({
+      strategy: UploadStrategy.DISK,
+      options: { path: '.', timeout: 1 },
+    });
 
     // when, then
     await expect(() => diskFileStore.save(file)).rejects.toThrow(
-      AbortException,
+      new TimeoutException('raise timeout: 1ms'),
     );
   });
 });
