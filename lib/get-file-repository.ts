@@ -4,6 +4,7 @@ import { DiskFileRepository } from './disk-file-repository';
 import { UploadStrategy } from './enum/upload-strategy';
 import { FileRepository } from './file-repository';
 import { FileUploadConfiguration } from './interface/file-upload-configuration';
+import { MemoryFileRepository } from './memory-file-repository';
 import { S3FileRepository } from './s3-file-repository';
 
 export const getFileRepository = (
@@ -14,6 +15,8 @@ export const getFileRepository = (
       return DiskFileRepository;
     case UploadStrategy.S3:
       return S3FileRepository;
+    case UploadStrategy.MEMORY:
+      return MemoryFileRepository;
     default:
       return unknownUploadStrategy(config);
   }

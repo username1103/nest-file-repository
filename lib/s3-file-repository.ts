@@ -2,7 +2,7 @@ import path from 'path';
 
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { NoSuchBucketException } from './exception/no-such-bucket.exception';
 import { TimeoutException } from './exception/timeout.exception';
@@ -17,6 +17,7 @@ import {
   MimetypeExtensionConverter,
 } from './interface/mimetype-extension-converter';
 
+@Injectable()
 export class S3FileRepository implements FileRepository {
   private readonly client: S3Client;
   constructor(
