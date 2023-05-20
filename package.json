@@ -8,7 +8,7 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "build": "tsc",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm test && npm build"
   },
   "repository": {
     "type": "git",
