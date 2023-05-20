@@ -14,6 +14,9 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
+      - name: Start localstack
+        run: docker compose up -d
+
       - name: Install Node
         uses: actions/setup-node@v3
         with:
