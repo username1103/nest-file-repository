@@ -58,7 +58,7 @@ describe('S3FileRepository', () => {
 
     // when, then
     await expect(() => s3FileRepository.save(file)).rejects.toThrow(
-      TimeoutException,
+      new TimeoutException('raise timeout: 1ms'),
     );
   });
 
@@ -85,7 +85,7 @@ describe('S3FileRepository', () => {
 
     // when, then
     await expect(() => s3FileRepository.save(file)).rejects.toThrow(
-      NoSuchBucketException,
+      new NoSuchBucketException(`not exist bucket: invalid`),
     );
   });
 });
