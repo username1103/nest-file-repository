@@ -22,7 +22,7 @@
     }
   ],
   "author": "username1103 <mikim961103@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/username1103/nest-file-manager/issues"
   },
