@@ -1,0 +1,15 @@
+/.idea
+/coverage
+/.github
+/lib
+/scripts
+.eslintrc.yml
+.gitignore
+.npmignore
+.prettierrc
+docker-compose.yml
+jest.config.js
+jest.setup.ts
+sample.jpeg
+tsconfig.json
+sonar-project.properties
