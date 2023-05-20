@@ -5,7 +5,10 @@ import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { FileRepository } from './file-repository';
+import { InvalidAccessKeyIdException } from '../exception/invalid-access-key-id.exception';
 import { NoSuchBucketException } from '../exception/no-such-bucket.exception';
+import { NotAllowedAclException } from '../exception/not-allowed-acl.exception';
+import { SignatureDoesNotMatchedException } from '../exception/signature-does-not-matched.exception';
 import { TimeoutException } from '../exception/timeout.exception';
 import { File } from '../File';
 import {
@@ -56,6 +59,27 @@ export class S3FileRepository implements FileRepository {
       if (e.name === 'NoSuchBucket') {
         throw new NoSuchBucketException(
           `not exist bucket: ${this.config.options.bucket}`,
+        );
+      }
+
+      if (e.name === 'AccessControlListNotSupported') {
+        throw new NotAllowedAclException(
+          `not allowed acl: ${JSON.stringify({
+            bucket: this.config.options.bucket,
+            acl: this.config.options.acl,
+          })}`,
+        );
+      }
+
+      if (e.name === 'InvalidAccessKeyId') {
+        throw new InvalidAccessKeyIdException(
+          `invalid accessKey Id: ${this.config.options.credentials.accessKeyId}`,
+        );
+      }
+
+      if (e.name === 'SignatureDoesNotMatch') {
+        throw new SignatureDoesNotMatchedException(
+          `secretAccessKey does not matched: ${this.config.options.credentials.secretAccessKey}`,
         );
       }
 
