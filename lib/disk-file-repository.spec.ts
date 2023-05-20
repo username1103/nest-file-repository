@@ -52,7 +52,7 @@ describe('DiskFileService', () => {
 
     // when, then
     await expect(() => diskFileStore.save(file)).rejects.toThrow(
-      TimeoutException,
+      new TimeoutException('raise timeout: 1ms'),
     );
   });
 });

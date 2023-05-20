@@ -9,7 +9,7 @@ import { DefaultMimetypeExtensionConverter } from './util/default-mimetype-exten
 describe('S3FileRepository', () => {
   it('upload file in s3', async () => {
     // given
-    const confg: S3FileUploadConfiguration = {
+    const config: S3FileUploadConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
         path: 'test-path',
@@ -25,7 +25,7 @@ describe('S3FileRepository', () => {
       },
     };
     const s3FileRepository = new S3FileRepository(
-      confg,
+      config,
       new DefaultMimetypeExtensionConverter(),
     );
 
