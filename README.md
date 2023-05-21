@@ -154,6 +154,13 @@ export class YourService {
 - `endPoint`: Set AWS endpoint.
 - `forcePathStyle`: Whether to force path style URLs for S3 objects (e.g., `https://s3.amazonaws.com/<bucketName>/<key>` instead of `https://<bucketName>.s3.amazonaws.com/<key>`.
     
+## Exception
+
+- `TimeoutException`: Times out
+- `NoSuchBucketException`: Does not exist s3 bucket.
+- `InvalidAccessKeyIdException`: Invalid access key id of s3
+- `NotAllowedAclException`: Not allowed acl of s3 bucket
+- `SignatureDoesNotMatchedException`: Not matched access key id and secret access key of s3
 
 
 ## License
