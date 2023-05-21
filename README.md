@@ -2,7 +2,10 @@
   <a href="https://nestjs.com"><img src="https://nestjs.com/img/logo_text.svg" alt="Nest Logo" width="320" /></a>
 </p>
 
-# Nest File Repository
+# nest-file-repository
+[![npm version](https://badge.fury.io/js/nest-file-repository.svg)](https://badge.fury.io/js/nest-file-repository)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=username1103_nest-file-manager&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=username1103_nest-file-manager)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=username1103_nest-file-manager&metric=coverage)](https://sonarcloud.io/summary/new_code?id=username1103_nest-file-manager)
 
 This library provides a flexible file repository for storing files.
 
