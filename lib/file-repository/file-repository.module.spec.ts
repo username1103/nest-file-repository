@@ -10,7 +10,9 @@ import {
   MemoryFileRepositoryConfiguration,
   S3FileRepositoryConfiguration,
 } from './interface/file-repository-configuration';
+import { S3_UPLOAD_OPTION_FACTORY } from './interface/s3-upload-option-factory';
 import { MemoryFileRepository } from './memory-file-repository/memory-file-repository';
+import { DefaultS3UploadOptionFactory } from './s3-file-repository/default-s3-upload-option-factory';
 import { S3FileRepository } from './s3-file-repository/s3-file-repository';
 import { UploadStrategy } from '../enum';
 
@@ -58,10 +60,12 @@ describe('FileRepositoryModule', () => {
     const fileService = module.get(FileRepository);
     const config = module.get(CONFIG);
     const aliasFileService = module.get(DEFAULT_ALIAS);
+    const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
 
     // then
     expect(fileService).toBeInstanceOf(S3FileRepository);
     expect(aliasFileService).toBeInstanceOf(S3FileRepository);
+    expect(s3UploadOptionFactory).toBeInstanceOf(DefaultS3UploadOptionFactory);
     expect(config).toBe(s3Config);
   });
 

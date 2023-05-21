@@ -17,12 +17,19 @@ import {
   CONFIG,
   S3FileRepositoryConfiguration,
 } from '../interface/file-repository-configuration';
+import {
+  S3_UPLOAD_OPTION_FACTORY,
+  S3UploadOptionFactory,
+} from '../interface/s3-upload-option-factory';
 
 @Injectable()
 export class S3FileRepository implements FileRepository {
   private readonly client: S3Client;
+
   constructor(
     @Inject(CONFIG) private readonly config: S3FileRepositoryConfiguration,
+    @Inject(S3_UPLOAD_OPTION_FACTORY)
+    private readonly s3UploadOptionFactory: S3UploadOptionFactory,
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
@@ -43,13 +50,12 @@ export class S3FileRepository implements FileRepository {
 
     try {
       await this.client.send(
-        new PutObjectCommand({
-          Bucket: this.config.options.bucket,
-          Key: filePath,
-          Body: file.data,
-          ACL: this.config.options.acl,
-          ContentType: file.mimetype,
-        }),
+        new PutObjectCommand(
+          this.s3UploadOptionFactory.getOptions(
+            new File(filePath, file.data, file.mimetype),
+            this.config,
+          ),
+        ),
       );
     } catch (e) {
       if (!(e instanceof Error)) {

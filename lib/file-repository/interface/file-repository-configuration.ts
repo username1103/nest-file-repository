@@ -1,3 +1,6 @@
+import { Type } from '@nestjs/common';
+
+import { S3UploadOptionFactory } from './s3-upload-option-factory';
 import { UploadStrategy } from '../../enum';
 import { Acl } from '../constant';
 
@@ -21,6 +24,7 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
     acl?: Acl;
     endPoint?: string;
     forcePathStyle?: boolean;
+    uploadOptionFactory?: Type<S3UploadOptionFactory>;
   };
 }
 
