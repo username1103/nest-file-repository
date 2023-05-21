@@ -1,5 +1,5 @@
 import { UploadStrategy } from '../../enum';
-import { acl } from '../constant';
+import { Acl } from '../constant';
 
 export const CONFIG = Symbol('CONFIG');
 
@@ -18,7 +18,7 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
       accessKeyId: string;
     };
     bucket: string;
-    acl?: acl;
+    acl?: Acl;
     endPoint?: string;
     forcePathStyle?: boolean;
   };
