@@ -1,9 +1,9 @@
 import * as fs from 'fs/promises';
 
 import { DiskFileRepository } from './disk-file-repository';
-import { TimeoutException } from './exception';
-import { UploadStrategy } from '../enum';
-import { File } from '../File';
+import { UploadStrategy } from '../../enum';
+import { File } from '../../File';
+import { TimeoutException } from '../exception';
 
 describe('DiskFileService', () => {
   it('save file in disk', async () => {

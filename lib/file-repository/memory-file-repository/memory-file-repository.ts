@@ -2,12 +2,12 @@ import path from 'path';
 
 import { Inject, Injectable } from '@nestjs/common';
 
-import { FileRepository } from './file-repository';
+import { File } from '../../File';
+import { FileRepository } from '../file-repository';
 import {
   CONFIG,
   MemoryFileRepositoryConfiguration,
-} from './interface/file-repository-configuration';
-import { File } from '../File';
+} from '../interface/file-repository-configuration';
 
 @Injectable()
 export class MemoryFileRepository implements FileRepository {
