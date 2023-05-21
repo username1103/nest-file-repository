@@ -18,7 +18,7 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
       accessKeyId: string;
     };
     bucket: string;
-    acl: acl;
+    acl?: acl;
     endPoint?: string;
     forcePathStyle?: boolean;
   };

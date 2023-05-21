@@ -153,7 +153,7 @@ export class YourService {
 - `credentials.accessKeyId`(required): Set an access key id with access to AWS s3.
 - `credentials.secretAccessKey`(required): Set a secret access key with access to AWS s3.
 - `bucket`(required): Set your bucket.
-- `acl`(required): Set available acl on your bucket.
+- `acl`: Set available acl on your bucket.
 - `endPoint`: Set AWS endpoint.
 - `forcePathStyle`: Whether to force path style URLs for S3 objects (e.g., `https://s3.amazonaws.com/<bucketName>/<key>` instead of `https://<bucketName>.s3.amazonaws.com/<key>`.
     
