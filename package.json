@@ -1,13 +1,14 @@
 {
   "name": "nest-file-repository",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "file repository for Nest framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "test:cov": "jest --coverage",
-    "build": "tsc",
+    "prebuild": "rimraf dist",
+    "build": "tsc --build",
     "prepublishOnly": "npm test && npm run build"
   },
   "repository": {
@@ -43,6 +44,7 @@
     "jest": "^29.5.0",
     "prettier": "^2.8.4",
     "reflect-metadata": "^0.1.13",
+    "rimraf": "^5.0.1",
     "rxjs": "^7.8.1",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
