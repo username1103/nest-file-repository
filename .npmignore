@@ -12,6 +12,7 @@
 docker-compose.yml
 jest.config.js
 jest.setup.ts
-sample.jpeg
+*.jpeg
+*.jpg
 tsconfig.json
 sonar-project.properties

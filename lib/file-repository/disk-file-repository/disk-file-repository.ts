@@ -5,13 +5,13 @@ import * as path from 'path';
 
 import { Inject, Injectable } from '@nestjs/common';
 
-import { TimeoutException } from './exception';
-import { FileRepository } from './file-repository';
+import { File } from '../../File';
+import { TimeoutException } from '../exception';
+import { FileRepository } from '../file-repository';
 import {
   CONFIG,
   DiskFileRepositoryConfiguration,
-} from './interface/file-repository-configuration';
-import { File } from '../File';
+} from '../interface/file-repository-configuration';
 
 @Injectable()
 export class DiskFileRepository implements FileRepository {

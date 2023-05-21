@@ -1,7 +1,7 @@
-import { MemoryFileRepositoryConfiguration } from './interface/file-repository-configuration';
 import { MemoryFileRepository } from './memory-file-repository';
-import { UploadStrategy } from '../enum';
-import { File } from '../File';
+import { UploadStrategy } from '../../enum';
+import { File } from '../../File';
+import { MemoryFileRepositoryConfiguration } from '../interface/file-repository-configuration';
 
 describe('MemoryFileRepository', () => {
   it('save file in storage', async () => {

@@ -4,19 +4,19 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import { Inject, Injectable } from '@nestjs/common';
 
+import { File } from '../../File';
 import {
-  TimeoutException,
-  SignatureDoesNotMatchedException,
-  NotAllowedAclException,
-  NoSuchBucketException,
   InvalidAccessKeyIdException,
-} from './exception';
-import { FileRepository } from './file-repository';
+  NoSuchBucketException,
+  NotAllowedAclException,
+  SignatureDoesNotMatchedException,
+  TimeoutException,
+} from '../exception';
+import { FileRepository } from '../file-repository';
 import {
   CONFIG,
   S3FileRepositoryConfiguration,
-} from './interface/file-repository-configuration';
-import { File } from '../File';
+} from '../interface/file-repository-configuration';
 
 @Injectable()
 export class S3FileRepository implements FileRepository {
