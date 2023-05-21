@@ -3,12 +3,12 @@ import { acl } from '../constant';
 
 export const CONFIG = Symbol('CONFIG');
 
-export type FileUploadConfiguration =
-  | DiskFileUploadConfiguration
-  | S3FileUploadConfiguration
-  | MemoryFileUploadConfiguration;
+export type FileRepositoryConfiguration =
+  | DiskFileRepositoryConfiguration
+  | S3FileRepositoryConfiguration
+  | MemoryFileRepositoryConfiguration;
 
-export interface S3FileUploadConfiguration extends CommonConfiguration {
+export interface S3FileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.S3;
 
   options: CommonOptions & {
@@ -24,13 +24,13 @@ export interface S3FileUploadConfiguration extends CommonConfiguration {
   };
 }
 
-export interface DiskFileUploadConfiguration extends CommonConfiguration {
+export interface DiskFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.DISK;
 
   options?: CommonOptions;
 }
 
-export interface MemoryFileUploadConfiguration extends CommonConfiguration {
+export interface MemoryFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.MEMORY;
 
   options?: CommonOptions;

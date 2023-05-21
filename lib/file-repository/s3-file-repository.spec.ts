@@ -1,5 +1,5 @@
 import { TimeoutException, NoSuchBucketException } from './exception';
-import { S3FileUploadConfiguration } from './interface/file-upload-configuration';
+import { S3FileRepositoryConfiguration } from './interface/file-repository-configuration';
 import { S3FileRepository } from './s3-file-repository';
 import { UploadStrategy } from '../enum';
 import { File } from '../File';
@@ -7,7 +7,7 @@ import { File } from '../File';
 describe('S3FileRepository', () => {
   it('upload file in s3', async () => {
     // given
-    const config: S3FileUploadConfiguration = {
+    const config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
         path: 'test-path',
@@ -35,7 +35,7 @@ describe('S3FileRepository', () => {
 
   it('upload file in s3 when no path in options of config', async () => {
     // given
-    const config: S3FileUploadConfiguration = {
+    const config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
         region: 'test',
@@ -62,7 +62,7 @@ describe('S3FileRepository', () => {
 
   it('throw timeout exception when it times out', async () => {
     // given
-    const config: S3FileUploadConfiguration = {
+    const config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
         path: 'test-path',
@@ -90,7 +90,7 @@ describe('S3FileRepository', () => {
 
   it('throw NoSuchBucketException when bucket does not exist', async () => {
     // given
-    const config: S3FileUploadConfiguration = {
+    const config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
         path: 'test-path',

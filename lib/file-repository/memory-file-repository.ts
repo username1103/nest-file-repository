@@ -5,15 +5,15 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FileRepository } from './file-repository';
 import {
   CONFIG,
-  MemoryFileUploadConfiguration,
-} from './interface/file-upload-configuration';
+  MemoryFileRepositoryConfiguration,
+} from './interface/file-repository-configuration';
 import { File } from '../File';
 
 @Injectable()
 export class MemoryFileRepository implements FileRepository {
   private readonly storage = new Map<string, File>();
   constructor(
-    @Inject(CONFIG) private readonly config: MemoryFileUploadConfiguration,
+    @Inject(CONFIG) private readonly config: MemoryFileRepositoryConfiguration,
   ) {}
 
   async save(file: File): Promise<string> {

@@ -1,4 +1,4 @@
-import { MemoryFileUploadConfiguration } from './interface/file-upload-configuration';
+import { MemoryFileRepositoryConfiguration } from './interface/file-repository-configuration';
 import { MemoryFileRepository } from './memory-file-repository';
 import { UploadStrategy } from '../enum';
 import { File } from '../File';
@@ -6,7 +6,7 @@ import { File } from '../File';
 describe('MemoryFileRepository', () => {
   it('save file in storage', async () => {
     // given
-    const config: MemoryFileUploadConfiguration = {
+    const config: MemoryFileRepositoryConfiguration = {
       strategy: UploadStrategy.MEMORY,
       options: {
         path: './test',
@@ -27,7 +27,7 @@ describe('MemoryFileRepository', () => {
 
   it('save file in storage when no path in options of config', async () => {
     // given
-    const config: MemoryFileUploadConfiguration = {
+    const config: MemoryFileRepositoryConfiguration = {
       strategy: UploadStrategy.MEMORY,
     };
     const file = new File('test.txt', Buffer.from('hello'));
@@ -45,7 +45,7 @@ describe('MemoryFileRepository', () => {
 
   it('return null when querying data that does not exist', async () => {
     // given
-    const config: MemoryFileUploadConfiguration = {
+    const config: MemoryFileRepositoryConfiguration = {
       strategy: UploadStrategy.MEMORY,
     };
 

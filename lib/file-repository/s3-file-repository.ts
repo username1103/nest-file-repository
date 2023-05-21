@@ -14,15 +14,15 @@ import {
 import { FileRepository } from './file-repository';
 import {
   CONFIG,
-  S3FileUploadConfiguration,
-} from './interface/file-upload-configuration';
+  S3FileRepositoryConfiguration,
+} from './interface/file-repository-configuration';
 import { File } from '../File';
 
 @Injectable()
 export class S3FileRepository implements FileRepository {
   private readonly client: S3Client;
   constructor(
-    @Inject(CONFIG) private readonly config: S3FileUploadConfiguration,
+    @Inject(CONFIG) private readonly config: S3FileRepositoryConfiguration,
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
@@ -33,7 +33,7 @@ export class S3FileRepository implements FileRepository {
         secretAccessKey: this.config.options.credentials.secretAccessKey,
       },
       requestHandler: new NodeHttpHandler({
-        requestTimeout: this.config.options.timeout,
+        requestTimeout: this.config.options.timeout ?? 0,
       }),
     });
   }

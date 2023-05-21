@@ -6,10 +6,10 @@ import { FileRepository } from './file-repository';
 import { FileRepositoryModule } from './file-repository.module';
 import {
   CONFIG,
-  DiskFileUploadConfiguration,
-  MemoryFileUploadConfiguration,
-  S3FileUploadConfiguration,
-} from './interface/file-upload-configuration';
+  DiskFileRepositoryConfiguration,
+  MemoryFileRepositoryConfiguration,
+  S3FileRepositoryConfiguration,
+} from './interface/file-repository-configuration';
 import { MemoryFileRepository } from './memory-file-repository';
 import { S3FileRepository } from './s3-file-repository';
 import { UploadStrategy } from '../enum';
@@ -17,7 +17,7 @@ import { UploadStrategy } from '../enum';
 describe('FileRepositoryModule', () => {
   it('make disk file repository by disk config', async () => {
     // given
-    const diskConfig: DiskFileUploadConfiguration = {
+    const diskConfig: DiskFileRepositoryConfiguration = {
       strategy: UploadStrategy.DISK,
       options: { path: '.' },
     };
@@ -38,7 +38,7 @@ describe('FileRepositoryModule', () => {
 
   it('make s3 file repository by s3 config', async () => {
     // given
-    const s3Config: S3FileUploadConfiguration = {
+    const s3Config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
         credentials: {
@@ -67,7 +67,7 @@ describe('FileRepositoryModule', () => {
 
   it('make memory file repository by memory config', async () => {
     // given
-    const memoryConfig: MemoryFileUploadConfiguration = {
+    const memoryConfig: MemoryFileRepositoryConfiguration = {
       strategy: UploadStrategy.MEMORY,
     };
     const module = await Test.createTestingModule({

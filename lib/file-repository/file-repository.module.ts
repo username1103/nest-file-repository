@@ -5,11 +5,11 @@ import { FileRepository } from './file-repository';
 import { getFileRepository } from './get-file-repository';
 import {
   CONFIG,
-  FileUploadConfiguration,
-} from './interface/file-upload-configuration';
+  FileRepositoryConfiguration,
+} from './interface/file-repository-configuration';
 
 export class FileRepositoryModule {
-  static register(config: FileUploadConfiguration): DynamicModule {
+  static register(config: FileRepositoryConfiguration): DynamicModule {
     const repositoryAlias = config.name ?? DEFAULT_ALIAS;
     return {
       module: FileRepositoryModule,

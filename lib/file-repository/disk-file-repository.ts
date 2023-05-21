@@ -9,14 +9,14 @@ import { TimeoutException } from './exception';
 import { FileRepository } from './file-repository';
 import {
   CONFIG,
-  DiskFileUploadConfiguration,
-} from './interface/file-upload-configuration';
+  DiskFileRepositoryConfiguration,
+} from './interface/file-repository-configuration';
 import { File } from '../File';
 
 @Injectable()
 export class DiskFileRepository implements FileRepository {
   constructor(
-    @Inject(CONFIG) private readonly config: DiskFileUploadConfiguration,
+    @Inject(CONFIG) private readonly config: DiskFileRepositoryConfiguration,
   ) {}
 
   async save(file: File): Promise<string> {

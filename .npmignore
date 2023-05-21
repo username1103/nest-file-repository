@@ -3,6 +3,8 @@
 /.github
 /lib
 /scripts
+/sample
+/example
 .eslintrc.yml
 .gitignore
 .npmignore
