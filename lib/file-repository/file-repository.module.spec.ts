@@ -266,6 +266,7 @@ describe('FileRepositoryModule', () => {
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get<Factory>(S3_UPLOAD_OPTION_FACTORY);
+    const testModule = module.get(TestModule);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
@@ -274,6 +275,7 @@ describe('FileRepositoryModule', () => {
     expect(s3UploadOptionFactory.nameGenerator).toBeInstanceOf(
       IdentityNameGenerator,
     );
+    expect(testModule).toBeInstanceOf(TestModule);
     expect(config).toBe(s3Config);
   });
 
