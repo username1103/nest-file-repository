@@ -1,7 +1,6 @@
-import { Type } from '@nestjs/common';
-
 import { S3UploadOptionFactory } from './s3-upload-option-factory';
 import { UploadStrategy } from '../../enum';
+import { CustomProvider } from '../../interface/custom-provider';
 import { Acl } from '../constant';
 
 export const CONFIG = Symbol('CONFIG');
@@ -24,7 +23,7 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
     acl?: Acl;
     endPoint?: string;
     forcePathStyle?: boolean;
-    uploadOptionFactory?: Type<S3UploadOptionFactory>;
+    uploadOptionFactory?: CustomProvider<S3UploadOptionFactory>;
   };
 }
 

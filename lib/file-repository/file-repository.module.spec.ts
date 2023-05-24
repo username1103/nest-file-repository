@@ -1,3 +1,4 @@
+import { Injectable, Module } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
 import { DEFAULT_ALIAS } from './constant';
@@ -10,11 +11,18 @@ import {
   MemoryFileRepositoryConfiguration,
   S3FileRepositoryConfiguration,
 } from './interface/file-repository-configuration';
-import { S3_UPLOAD_OPTION_FACTORY } from './interface/s3-upload-option-factory';
+import {
+  S3_UPLOAD_OPTION_FACTORY,
+  S3UploadOption,
+  S3UploadOptionFactory,
+} from './interface/s3-upload-option-factory';
 import { MemoryFileRepository } from './memory-file-repository/memory-file-repository';
 import { DefaultS3UploadOptionFactory } from './s3-file-repository/default-s3-upload-option-factory';
 import { S3FileRepository } from './s3-file-repository/s3-file-repository';
 import { UploadStrategy } from '../enum';
+import { File } from '../File';
+import { NAME_GENERATOR, NameGenerator } from '../interface/name-generator';
+import { IdentityNameGenerator } from '../util/identity-name-generator';
 
 describe('FileRepositoryModule', () => {
   it('make disk file repository by disk config', async () => {
@@ -28,13 +36,13 @@ describe('FileRepositoryModule', () => {
     }).compile();
 
     // when
-    const fileService = module.get(FileRepository);
+    const fileRepository = module.get(FileRepository);
     const config = module.get(CONFIG);
-    const aliasFileService = module.get(DEFAULT_ALIAS);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
 
     // then
-    expect(fileService).toBeInstanceOf(DiskFileRepository);
-    expect(aliasFileService).toBeInstanceOf(DiskFileRepository);
+    expect(fileRepository).toBeInstanceOf(DiskFileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(DiskFileRepository);
     expect(config).toBe(diskConfig);
   });
 
@@ -57,15 +65,215 @@ describe('FileRepositoryModule', () => {
     }).compile();
 
     // when
-    const fileService = module.get(FileRepository);
+    const fileRepository = module.get(FileRepository);
     const config = module.get(CONFIG);
-    const aliasFileService = module.get(DEFAULT_ALIAS);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
 
     // then
-    expect(fileService).toBeInstanceOf(S3FileRepository);
-    expect(aliasFileService).toBeInstanceOf(S3FileRepository);
+    expect(fileRepository).toBeInstanceOf(S3FileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(DefaultS3UploadOptionFactory);
+    expect(config).toBe(s3Config);
+  });
+
+  it('make s3 file repository by s3 config with custom upload options factory', async () => {
+    // given
+    @Injectable()
+    class Factory implements S3UploadOptionFactory {
+      getOptions(
+        file: File,
+        config: S3FileRepositoryConfiguration,
+      ): S3UploadOption {
+        return {
+          Bucket: config.options.bucket,
+          Key: file.filename,
+          Body: file.data,
+        };
+      }
+    }
+    const s3Config: S3FileRepositoryConfiguration = {
+      strategy: UploadStrategy.S3,
+      options: {
+        credentials: {
+          accessKeyId: 'test',
+          secretAccessKey: 'test',
+        },
+        acl: 'public-read',
+        bucket: 'test',
+        region: 'test',
+        uploadOptionFactory: Factory,
+      },
+    };
+    const module = await Test.createTestingModule({
+      imports: [FileRepositoryModule.register(s3Config)],
+    }).compile();
+
+    // when
+    const fileRepository = module.get(FileRepository);
+    const config = module.get(CONFIG);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
+    const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
+
+    // then
+    expect(fileRepository).toBeInstanceOf(S3FileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
+    expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(config).toBe(s3Config);
+  });
+
+  it('make s3 file repository by s3 config with custom upload options factory by ClassProvider', async () => {
+    // given
+    @Injectable()
+    class Factory implements S3UploadOptionFactory {
+      getOptions(
+        file: File,
+        config: S3FileRepositoryConfiguration,
+      ): S3UploadOption {
+        return {
+          Bucket: config.options.bucket,
+          Key: file.filename,
+          Body: file.data,
+        };
+      }
+    }
+    const s3Config: S3FileRepositoryConfiguration = {
+      strategy: UploadStrategy.S3,
+      options: {
+        credentials: {
+          accessKeyId: 'test',
+          secretAccessKey: 'test',
+        },
+        acl: 'public-read',
+        bucket: 'test',
+        region: 'test',
+        uploadOptionFactory: { useClass: Factory },
+      },
+    };
+    const module = await Test.createTestingModule({
+      imports: [FileRepositoryModule.register(s3Config)],
+    }).compile();
+
+    // when
+    const fileRepository = module.get(FileRepository);
+    const config = module.get(CONFIG);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
+    const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
+
+    // then
+    expect(fileRepository).toBeInstanceOf(S3FileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
+    expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(config).toBe(s3Config);
+  });
+
+  it('make s3 file repository by s3 config with custom upload options factory by ValueProvide', async () => {
+    // given
+    @Injectable()
+    class Factory implements S3UploadOptionFactory {
+      getOptions(
+        file: File,
+        config: S3FileRepositoryConfiguration,
+      ): S3UploadOption {
+        return {
+          Bucket: config.options.bucket,
+          Key: file.filename,
+          Body: file.data,
+        };
+      }
+    }
+    const s3Config: S3FileRepositoryConfiguration = {
+      strategy: UploadStrategy.S3,
+      options: {
+        credentials: {
+          accessKeyId: 'test',
+          secretAccessKey: 'test',
+        },
+        acl: 'public-read',
+        bucket: 'test',
+        region: 'test',
+        uploadOptionFactory: { useValue: new Factory() },
+      },
+    };
+
+    const module = await Test.createTestingModule({
+      imports: [FileRepositoryModule.register(s3Config)],
+    }).compile();
+
+    // when
+    const fileRepository = module.get(FileRepository);
+    const config = module.get(CONFIG);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
+    const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
+
+    // then
+    expect(fileRepository).toBeInstanceOf(S3FileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
+    expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(s3UploadOptionFactory).toBe(
+      (s3Config.options.uploadOptionFactory as any).useValue,
+    );
+    expect(config).toBe(s3Config);
+  });
+
+  it('make s3 file repository by s3 config with custom upload options factory by FactoryProvider', async () => {
+    // given
+    @Module({
+      providers: [{ provide: NAME_GENERATOR, useClass: IdentityNameGenerator }],
+      exports: [NAME_GENERATOR],
+    })
+    class TestModule {}
+    @Injectable()
+    class Factory implements S3UploadOptionFactory {
+      constructor(readonly nameGenerator: NameGenerator) {}
+
+      getOptions(
+        file: File,
+        config: S3FileRepositoryConfiguration,
+      ): S3UploadOption {
+        return {
+          Bucket: config.options.bucket,
+          Key: this.nameGenerator.generate(file),
+          Body: file.data,
+        };
+      }
+    }
+    const s3Config: S3FileRepositoryConfiguration = {
+      strategy: UploadStrategy.S3,
+      options: {
+        credentials: {
+          accessKeyId: 'test',
+          secretAccessKey: 'test',
+        },
+        acl: 'public-read',
+        bucket: 'test',
+        region: 'test',
+        uploadOptionFactory: {
+          imports: [TestModule],
+          useFactory: (nameGenerator: NameGenerator) =>
+            new Factory(nameGenerator),
+          inject: [NAME_GENERATOR],
+        },
+      },
+    };
+
+    const module = await Test.createTestingModule({
+      imports: [FileRepositoryModule.register(s3Config)],
+    }).compile();
+
+    // when
+    const fileRepository = module.get(FileRepository);
+    const config = module.get(CONFIG);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
+    const s3UploadOptionFactory = module.get<Factory>(S3_UPLOAD_OPTION_FACTORY);
+
+    // then
+    expect(fileRepository).toBeInstanceOf(S3FileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
+    expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(s3UploadOptionFactory.nameGenerator).toBeInstanceOf(
+      IdentityNameGenerator,
+    );
     expect(config).toBe(s3Config);
   });
 
@@ -79,13 +287,13 @@ describe('FileRepositoryModule', () => {
     }).compile();
 
     // when
-    const fileService = module.get(FileRepository);
+    const fileRepository = module.get(FileRepository);
     const config = module.get(CONFIG);
-    const aliasFileService = module.get(DEFAULT_ALIAS);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
 
     // then
-    expect(fileService).toBeInstanceOf(MemoryFileRepository);
-    expect(aliasFileService).toBeInstanceOf(MemoryFileRepository);
+    expect(fileRepository).toBeInstanceOf(MemoryFileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(MemoryFileRepository);
     expect(config).toBe(memoryConfig);
   });
 
