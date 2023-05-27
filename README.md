@@ -138,6 +138,183 @@ export class YourService {
 }
 ```
 
+### CustomProvider
+
+You can customize some providers. For example, `options.uploadOptionFactory` in `S3FileRepositoryConfiguration` is type `CustomProvider<S3UploadOptionFactory>`.  
+Type `CustomProvider<T>` can be customized in four ways: `Type<T>`, `CustomClassProvider<T>`, `CustomValueProvider<T>`, `CustomFactoryProvider<T>`. It is similar to `Provider` of NestJS.
+
+#### Type\<T>
+
+If you set implementation of generic type parameter in CustomProvider, then it is replaced by instance of your customized class. 
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { S3UploadOptionFactory } from 'nest-file-repository';
+
+@Injectable()
+class CustomS3UploadOptionFactory implements S3UploadOptionFactory {
+  getOptions(
+    file: File,
+    config: S3FileRepositoryConfiguration,
+  ): S3UploadOption {
+    return {
+      Bucket: config.options.bucket,
+      Key: file.filename,
+      Body: file.data,
+    };
+  }
+}
+```
+
+```typescript
+import { Module } from '@nestjs/common';
+import { YourService } from './your.service';
+import { FileRepositoryModule, UploadStrategy } from 'nest-file-repository';
+
+@Module({
+  imports: [
+    FileRepositoryModule.register({
+      strategy: UploadStrategy.S3,
+      options: {
+        region: 'your region',
+        bucket: 'your bucket',
+        acl: 'public-read', // acl of your bucket
+        credentials: {
+          accessKeyId: 'your access key id',
+          secretAccessKey: 'your secret access key',
+        },
+        uploadOptionFactory: CustomS3UploadOptionFactory,
+      },
+    })
+  ],
+  providers: [YourService],
+})
+export class YourModule {}
+```
+
+#### CustomClassProvider\<T>
+
+It works almost the same as the `Type<T>`. 
+
+```typescript
+import { Module } from '@nestjs/common';
+import { YourService } from './your.service';
+import { FileRepositoryModule, UploadStrategy } from 'nest-file-repository';
+
+@Module({
+  imports: [
+    FileRepositoryModule.register({
+      strategy: UploadStrategy.S3,
+      options: {
+        region: 'your region',
+        bucket: 'your bucket',
+        acl: 'public-read', // acl of your bucket
+        credentials: {
+          accessKeyId: 'your access key id',
+          secretAccessKey: 'your secret access key',
+        },
+        uploadOptionFactory: { useClass: CustomS3UploadOptionFactory }
+      },
+    })
+  ],
+  providers: [YourService],
+})
+export class YourModule {}
+```
+
+#### CustomValueProvider\<T>
+
+If you set instance of generic type parameter in CustomProvider, then it is replaced by the value.
+
+```typescript
+import { Module } from '@nestjs/common';
+import { YourService } from './your.service';
+import { FileRepositoryModule, UploadStrategy } from 'nest-file-repository';
+
+@Module({
+  imports: [
+    FileRepositoryModule.register({
+      strategy: UploadStrategy.S3,
+      options: {
+        region: 'your region',
+        bucket: 'your bucket',
+        acl: 'public-read', // acl of your bucket
+        credentials: {
+          accessKeyId: 'your access key id',
+          secretAccessKey: 'your secret access key',
+        },
+        uploadOptionFactory: { useValue: new CustomS3UploadOptionFactory() }
+      },
+    })
+  ],
+  providers: [YourService],
+})
+export class YourModule {}
+```
+
+#### CustomFactoryProvider\<T>
+
+If you want to customize implementation requiring DI, can use `CustomFactoryProvider`.
+
+```typescript
+@Injectable()
+class CustomS3UploadOptionFactory implements S3UploadOptionFactory {
+
+  constructor(private readonly nameGenerator: NameGenerator) {}
+
+  getOptions(
+    file: File,
+    config: S3FileRepositoryConfiguration,
+  ): S3UploadOption {
+    return {
+      Bucket: config.options.bucket,
+      Key: this.nameGenerator.generate(file),
+      Body: file.data,
+    };
+  }
+}
+```
+
+Prepare a module with provider to be injected. If the global module contains the value you want to inject, it is not necessary.
+
+```typescript
+@Module({
+  providers: [IdentityNameGenerator],
+  exports: [IdentityNameGenerator],
+})
+class NameGeneratorModule {
+}
+```
+
+Import prepared modules, inject provider you want and set factory function. Then it is replaced by return value of factory function.
+
+```typescript
+@Module({
+  imports: [
+    FileRepositoryModule.register({
+      strategy: UploadStrategy.S3,
+      options: {
+        region: 'your region',
+        bucket: 'your bucket',
+        acl: 'public-read', // acl of your bucket
+        credentials: {
+          accessKeyId: 'your access key id',
+          secretAccessKey: 'your secret access key',
+        },
+        uploadOptionFactory: {
+          import: [NameGeneratorModule],
+          useFactory: (nameGenerator: NameGenerator) => new CustomS3UploadOptionFactory(nameGenerator),
+          inject: [IdentityNameGenerator]
+        }
+      },
+    })
+  ],
+  providers: [YourService],
+})
+export class YourModule {
+}
+```
+
 ## options
 
 ### common options
@@ -156,6 +333,7 @@ export class YourService {
 - `acl`: Set available acl on your bucket.
 - `endPoint`: Set AWS endpoint.
 - `forcePathStyle`: Whether to force path style URLs for S3 objects (e.g., `https://s3.amazonaws.com/<bucketName>/<key>` instead of `https://<bucketName>.s3.amazonaws.com/<key>`.
+- `uploadOptionFactory`: Set the implementation of the `S3UploadOptionFactory`. By default, the `DefaultS3UploadOptionFactory` is used. 
     
 ## Exception
 
