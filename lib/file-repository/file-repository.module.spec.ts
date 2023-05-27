@@ -5,9 +5,11 @@ import { DEFAULT_ALIAS } from './constant';
 import { DiskFileRepository } from './disk-file-repository/disk-file-repository';
 import { FileRepository } from './file-repository';
 import { FileRepositoryModule } from './file-repository.module';
+import { GcsFileRepository } from './gcs-file-repository/gcs-file-repository';
 import {
   CONFIG,
   DiskFileRepositoryConfiguration,
+  GCSFileRepositoryConfiguration,
   MemoryFileRepositoryConfiguration,
   S3FileRepositoryConfiguration,
 } from './interface/file-repository-configuration';
@@ -277,6 +279,26 @@ describe('FileRepositoryModule', () => {
     );
     expect(testModule).toBeInstanceOf(TestModule);
     expect(config).toBe(s3Config);
+  });
+
+  it('make gcs file repository by gcs config', async () => {
+    // given
+    const gcsConfig: GCSFileRepositoryConfiguration = {
+      strategy: UploadStrategy.GCS,
+    };
+    const module = await Test.createTestingModule({
+      imports: [FileRepositoryModule.register(gcsConfig)],
+    }).compile();
+
+    // when
+    const fileRepository = module.get(FileRepository);
+    const config = module.get(CONFIG);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
+
+    // then
+    expect(fileRepository).toBeInstanceOf(GcsFileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(GcsFileRepository);
+    expect(config).toBe(gcsConfig);
   });
 
   it('make memory file repository by memory config', async () => {
