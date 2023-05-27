@@ -1,3 +1,4 @@
+import { DefaultS3UploadOptionFactory } from './default-s3-upload-option-factory';
 import { S3FileRepository } from './s3-file-repository';
 import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
@@ -22,7 +23,10 @@ describe('S3FileRepository', () => {
         acl: 'public-read',
       },
     };
-    const s3FileRepository = new S3FileRepository(config);
+    const s3FileRepository = new S3FileRepository(
+      config,
+      new DefaultS3UploadOptionFactory(),
+    );
 
     const file = new File('file.txt', Buffer.from('hello'));
 
@@ -49,7 +53,10 @@ describe('S3FileRepository', () => {
         acl: 'public-read',
       },
     };
-    const s3FileRepository = new S3FileRepository(config);
+    const s3FileRepository = new S3FileRepository(
+      config,
+      new DefaultS3UploadOptionFactory(),
+    );
 
     const file = new File('file.txt', Buffer.from('hello'));
 
@@ -78,7 +85,10 @@ describe('S3FileRepository', () => {
         timeout: 1,
       },
     };
-    const s3FileRepository = new S3FileRepository(config);
+    const s3FileRepository = new S3FileRepository(
+      config,
+      new DefaultS3UploadOptionFactory(),
+    );
 
     const file = new File('file.jpeg', Buffer.from('hello'));
 
@@ -105,7 +115,10 @@ describe('S3FileRepository', () => {
         acl: 'public-read',
       },
     };
-    const s3FileRepository = new S3FileRepository(config);
+    const s3FileRepository = new S3FileRepository(
+      config,
+      new DefaultS3UploadOptionFactory(),
+    );
 
     const file = new File('file.jpeg', Buffer.from('hello'));
 

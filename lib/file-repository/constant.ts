@@ -10,4 +10,4 @@ export const ACL = {
   PUBLIC_READ_WRITE: 'public-read-write',
 } as const;
 
-export type acl = (typeof ACL)[keyof typeof ACL];
+export type Acl = (typeof ACL)[keyof typeof ACL];
