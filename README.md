@@ -12,7 +12,7 @@ This library provides a flexible file repository for storing files.
 ## Features
 
 - Provides a flexible file repository
-- Support Disk, Memory, AWS S3 file repository
+- Support Disk, Memory, AWS S3, GCS(google cloud storage) file repository
 
 ## Installation
 
@@ -333,12 +333,22 @@ export class YourModule {
 - `acl`: Set available acl on your bucket.
 - `endPoint`: Set AWS endpoint.
 - `forcePathStyle`: Whether to force path style URLs for S3 objects (e.g., `https://s3.amazonaws.com/<bucketName>/<key>` instead of `https://<bucketName>.s3.amazonaws.com/<key>`.
-- `uploadOptionFactory`: Set the implementation of the `S3UploadOptionFactory`. By default, the `DefaultS3UploadOptionFactory` is used. 
+- `uploadOptionFactory`: Set the implementation of the `S3UploadOptionFactory`. By default, the `DefaultS3UploadOptionFactory` is used.
+
+### GCS options
+
+- `bucket`(required): Set your bucket.
+- `acl`: Set available acl on your bucket.
+- `apiEndPoint`: Set your api endpoint.
+- `projectId`: Set your project id. If not provided, the library will attempt to automatically detect the project ID based on the environment.
+- `keyFile`: Set your keyfile path.
+- `uploadOptionFactory`: Set the implementation of the `GCSUploadOptionFactory`. By default, the `DefaultGCSUploadOptionFactory` is used.
+
     
 ## Exception
 
 - `TimeoutException`: Times out
-- `NoSuchBucketException`: Does not exist s3 bucket.
+- `NoSuchBucketException`: Does not exist s3 or gcs bucket.
 - `InvalidAccessKeyIdException`: Invalid access key id of s3
 - `NotAllowedAclException`: Not allowed acl of s3 bucket
 - `SignatureDoesNotMatchedException`: Not matched access key id and secret access key of s3
