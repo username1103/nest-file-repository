@@ -1,3 +1,4 @@
+import { DefaultGCSUploadOptionFactory } from './default-gcs-upload-option-factory';
 import { GCSFileRepository } from './gcs-file-repository';
 import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
@@ -16,7 +17,10 @@ describe('GCSFileRepository', () => {
         path: '/test',
       },
     };
-    const gcsFileRepository = new GCSFileRepository(config);
+    const gcsFileRepository = new GCSFileRepository(
+      config,
+      new DefaultGCSUploadOptionFactory(),
+    );
 
     const file = new File('file.txt', Buffer.from('hello'));
 
@@ -37,7 +41,10 @@ describe('GCSFileRepository', () => {
         bucket: 'test-bucket',
       },
     };
-    const gcsFileRepository = new GCSFileRepository(config);
+    const gcsFileRepository = new GCSFileRepository(
+      config,
+      new DefaultGCSUploadOptionFactory(),
+    );
 
     const file = new File('file.txt', Buffer.from('hello'));
 
@@ -59,7 +66,10 @@ describe('GCSFileRepository', () => {
         timeout: 1,
       },
     };
-    const gcsFileRepository = new GCSFileRepository(config);
+    const gcsFileRepository = new GCSFileRepository(
+      config,
+      new DefaultGCSUploadOptionFactory(),
+    );
 
     const file = new File('file.txt', Buffer.from('hello'));
 
@@ -79,7 +89,10 @@ describe('GCSFileRepository', () => {
         bucket: 'test-bucket2',
       },
     };
-    const gcsFileRepository = new GCSFileRepository(config);
+    const gcsFileRepository = new GCSFileRepository(
+      config,
+      new DefaultGCSUploadOptionFactory(),
+    );
 
     const file = new File('file.txt', Buffer.from('hello'));
 

@@ -1,3 +1,4 @@
+import { GCSUploadOptionFactory } from './gcs-upload-option-factory';
 import { S3UploadOptionFactory } from './s3-upload-option-factory';
 import { UploadStrategy } from '../../enum';
 import { CustomProvider } from '../../interface/custom-provider';
@@ -36,6 +37,7 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
     keyFile?: string;
     apiEndPoint?: string;
     projectId?: string;
+    uploadOptionFactory?: CustomProvider<GCSUploadOptionFactory>;
   };
 }
 

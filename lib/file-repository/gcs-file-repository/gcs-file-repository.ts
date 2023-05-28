@@ -11,6 +11,10 @@ import {
   CONFIG,
   GCSFileRepositoryConfiguration,
 } from '../interface/file-repository-configuration';
+import {
+  GCS_UPLOAD_OPTION_FACTORY,
+  GCSUploadOptionFactory,
+} from '../interface/gcs-upload-option-factory';
 
 @Injectable()
 export class GCSFileRepository implements FileRepository {
@@ -18,6 +22,8 @@ export class GCSFileRepository implements FileRepository {
 
   constructor(
     @Inject(CONFIG) private readonly config: GCSFileRepositoryConfiguration,
+    @Inject(GCS_UPLOAD_OPTION_FACTORY)
+    private readonly uploadOptionFactory: GCSUploadOptionFactory,
   ) {
     this.client = new Storage({
       keyFilename: this.config.options.keyFile,
@@ -30,13 +36,17 @@ export class GCSFileRepository implements FileRepository {
   async save(file: File): Promise<string> {
     const filePath = path.join(this.config.options?.path ?? '', file.filename);
 
+    const options = this.uploadOptionFactory.getOptions(
+      new File(filePath, file.data, file.mimetype),
+      this.config,
+    );
     try {
       await this.client
-        .bucket(this.config.options.bucket)
-        .file(filePath)
-        .save(file.data, {
+        .bucket(options.Bucket)
+        .file(options.fileName)
+        .save(options.fileData, {
           timeout: this.config.options.timeout,
-          resumable: false,
+          resumable: options.resumable,
         });
     } catch (e) {
       if (!(e instanceof Error)) {

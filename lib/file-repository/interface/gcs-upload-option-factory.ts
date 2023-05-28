@@ -9,6 +9,7 @@ export type GCSUploadOption = {
   fileName: string;
   fileData: Buffer;
   ContentType?: Mimetype;
+  resumable: boolean;
 };
 
 export interface GCSUploadOptionFactory {
