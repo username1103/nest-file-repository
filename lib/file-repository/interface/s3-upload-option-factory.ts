@@ -10,7 +10,7 @@ export type S3UploadOption = {
   Key: string;
   Body: Buffer;
   ACL?: Acl;
-  ContentType?: Mimetype;
+  ContentType?: Mimetype | string;
   CacheControl?: string;
   ContentDisposition?: string;
 };

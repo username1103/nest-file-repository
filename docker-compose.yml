@@ -6,6 +6,7 @@ services:
       - "4566:4566"
     volumes:
       - "./scripts/localstack-init:/docker-entrypoint-initaws.d"
+      - "./scripts/data/test-bucket:/data"
     environment:
       - SERVICES=s3
 
@@ -15,6 +16,6 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./scripts/google-cloud-sdk/data:/data
+      - ./scripts/data:/data
     command: [ "-scheme", "http", "-port", "8080", "-external-url", "http://localhost:8080", "-backend", "memory" ]
 

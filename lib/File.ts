@@ -7,9 +7,9 @@ export class File {
 
   data: Buffer;
 
-  mimetype?: Mimetype;
+  mimetype?: Mimetype | string;
 
-  constructor(filename: string, data: Buffer, mimetype?: Mimetype) {
+  constructor(filename: string, data: Buffer, mimetype?: Mimetype | string) {
     this.filename = filename;
     this.data = data;
     this.mimetype = mimetype;

@@ -1,6 +1,10 @@
 import path from 'path';
 
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -99,5 +103,56 @@ export class S3FileRepository implements FileRepository {
     }
 
     return filePath;
+  }
+
+  async get(key: string): Promise<File | null> {
+    try {
+      const response = await this.client.send(
+        new GetObjectCommand({
+          Bucket: this.config.options.bucket,
+          Key: key,
+        }),
+      );
+
+      return new File(
+        key,
+        Buffer.from((await response.Body?.transformToByteArray()) ?? ''),
+        response.ContentType,
+      );
+    } catch (e) {
+      if (!(e instanceof Error)) {
+        throw e;
+      }
+
+      if (e.name === 'NoSuchKey') {
+        return null;
+      }
+
+      if (e.name === 'TimeoutError') {
+        throw new TimeoutException(
+          `raise timeout: ${this.config.options.timeout}ms`,
+        );
+      }
+
+      if (e.name === 'NoSuchBucket') {
+        throw new NoSuchBucketException(
+          `not exist bucket: ${this.config.options.bucket}`,
+        );
+      }
+
+      if (e.name === 'InvalidAccessKeyId') {
+        throw new InvalidAccessKeyIdException(
+          `invalid accessKey Id: ${this.config.options.credentials.accessKeyId}`,
+        );
+      }
+
+      if (e.name === 'SignatureDoesNotMatch') {
+        throw new SignatureDoesNotMatchedException(
+          `secretAccessKey does not matched: ${this.config.options.credentials.secretAccessKey}`,
+        );
+      }
+
+      throw e;
+    }
   }
 }
