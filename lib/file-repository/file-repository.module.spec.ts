@@ -5,12 +5,20 @@ import { DEFAULT_ALIAS } from './constant';
 import { DiskFileRepository } from './disk-file-repository/disk-file-repository';
 import { FileRepository } from './file-repository';
 import { FileRepositoryModule } from './file-repository.module';
+import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
+import { GCSFileRepository } from './gcs-file-repository/gcs-file-repository';
 import {
   CONFIG,
   DiskFileRepositoryConfiguration,
+  GCSFileRepositoryConfiguration,
   MemoryFileRepositoryConfiguration,
   S3FileRepositoryConfiguration,
 } from './interface/file-repository-configuration';
+import {
+  GCS_UPLOAD_OPTION_FACTORY,
+  GCSUploadOption,
+  GCSUploadOptionFactory,
+} from './interface/gcs-upload-option-factory';
 import {
   S3_UPLOAD_OPTION_FACTORY,
   S3UploadOption,
@@ -277,6 +285,73 @@ describe('FileRepositoryModule', () => {
     );
     expect(testModule).toBeInstanceOf(TestModule);
     expect(config).toBe(s3Config);
+  });
+
+  it('make gcs file repository by gcs config', async () => {
+    // given
+    const gcsConfig: GCSFileRepositoryConfiguration = {
+      strategy: UploadStrategy.GCS,
+      options: {
+        bucket: 'test-bucket',
+      },
+    };
+    const module = await Test.createTestingModule({
+      imports: [FileRepositoryModule.register(gcsConfig)],
+    }).compile();
+
+    // when
+    const fileRepository = module.get(FileRepository);
+    const config = module.get(CONFIG);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
+    const gcsUploadOptionFactory = module.get(GCS_UPLOAD_OPTION_FACTORY);
+
+    // then
+    expect(fileRepository).toBeInstanceOf(GCSFileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(GCSFileRepository);
+    expect(gcsUploadOptionFactory).toBeInstanceOf(
+      DefaultGCSUploadOptionFactory,
+    );
+    expect(config).toBe(gcsConfig);
+  });
+
+  it('make gcs file repository by gcs config with custom upload options factory', async () => {
+    // given
+    class CustomGCSUploadOptionFactory implements GCSUploadOptionFactory {
+      getOptions(
+        file: File,
+        config: GCSFileRepositoryConfiguration,
+      ): GCSUploadOption {
+        return {
+          Bucket: config.options.bucket,
+          fileName: file.filename,
+          fileData: file.data,
+          ContentType: file.mimetype,
+          resumable: false,
+        };
+      }
+    }
+    const gcsConfig: GCSFileRepositoryConfiguration = {
+      strategy: UploadStrategy.GCS,
+      options: {
+        bucket: 'test-bucket',
+        uploadOptionFactory: CustomGCSUploadOptionFactory,
+      },
+    };
+    const module = await Test.createTestingModule({
+      imports: [FileRepositoryModule.register(gcsConfig)],
+    }).compile();
+
+    // when
+    const fileRepository = module.get(FileRepository);
+    const config = module.get(CONFIG);
+    const aliasFileRepository = module.get(DEFAULT_ALIAS);
+    const gcsUploadOptionFactory = module.get(GCS_UPLOAD_OPTION_FACTORY);
+
+    // then
+    expect(fileRepository).toBeInstanceOf(GCSFileRepository);
+    expect(aliasFileRepository).toBeInstanceOf(GCSFileRepository);
+    expect(gcsUploadOptionFactory).toBeInstanceOf(CustomGCSUploadOptionFactory);
+    expect(config).toBe(gcsConfig);
   });
 
   it('make memory file repository by memory config', async () => {

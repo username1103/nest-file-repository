@@ -5,11 +5,13 @@ import { Type } from '@nestjs/common/interfaces/type.interface';
 
 import { DEFAULT_ALIAS } from './constant';
 import { FileRepository } from './file-repository';
+import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
 import { getFileRepository } from './get-file-repository';
 import {
   CONFIG,
   FileRepositoryConfiguration,
 } from './interface/file-repository-configuration';
+import { GCS_UPLOAD_OPTION_FACTORY } from './interface/gcs-upload-option-factory';
 import { S3_UPLOAD_OPTION_FACTORY } from './interface/s3-upload-option-factory';
 import { DefaultS3UploadOptionFactory } from './s3-file-repository/default-s3-upload-option-factory';
 import { UploadStrategy } from '../enum';
@@ -46,6 +48,22 @@ export class FileRepositoryModule {
         ...this.getCustomProvider(
           S3_UPLOAD_OPTION_FACTORY,
           config.options.uploadOptionFactory ?? DefaultS3UploadOptionFactory,
+        ),
+      );
+
+      if (
+        config.options.uploadOptionFactory &&
+        this.isCustomFactoryProvider(config.options.uploadOptionFactory)
+      ) {
+        imports.push(...(config.options.uploadOptionFactory.imports ?? []));
+      }
+    }
+
+    if (config.strategy === UploadStrategy.GCS) {
+      providers.push(
+        ...this.getCustomProvider(
+          GCS_UPLOAD_OPTION_FACTORY,
+          config.options.uploadOptionFactory ?? DefaultGCSUploadOptionFactory,
         ),
       );
 

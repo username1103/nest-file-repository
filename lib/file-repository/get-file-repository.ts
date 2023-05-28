@@ -2,6 +2,7 @@ import { Type } from '@nestjs/common';
 
 import { DiskFileRepository } from './disk-file-repository/disk-file-repository';
 import { FileRepository } from './file-repository';
+import { GCSFileRepository } from './gcs-file-repository/gcs-file-repository';
 import { FileRepositoryConfiguration } from './interface/file-repository-configuration';
 import { MemoryFileRepository } from './memory-file-repository/memory-file-repository';
 import { S3FileRepository } from './s3-file-repository/s3-file-repository';
@@ -15,6 +16,8 @@ export const getFileRepository = (
       return DiskFileRepository;
     case UploadStrategy.S3:
       return S3FileRepository;
+    case UploadStrategy.GCS:
+      return GCSFileRepository;
     case UploadStrategy.MEMORY:
       return MemoryFileRepository;
     default:

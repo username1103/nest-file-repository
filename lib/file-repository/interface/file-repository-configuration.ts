@@ -1,3 +1,4 @@
+import { GCSUploadOptionFactory } from './gcs-upload-option-factory';
 import { S3UploadOptionFactory } from './s3-upload-option-factory';
 import { UploadStrategy } from '../../enum';
 import { CustomProvider } from '../../interface/custom-provider';
@@ -8,6 +9,7 @@ export const CONFIG = Symbol('CONFIG');
 export type FileRepositoryConfiguration =
   | DiskFileRepositoryConfiguration
   | S3FileRepositoryConfiguration
+  | GCSFileRepositoryConfiguration
   | MemoryFileRepositoryConfiguration;
 
 export interface S3FileRepositoryConfiguration extends CommonConfiguration {
@@ -24,6 +26,18 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
     endPoint?: string;
     forcePathStyle?: boolean;
     uploadOptionFactory?: CustomProvider<S3UploadOptionFactory>;
+  };
+}
+
+export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
+  strategy: UploadStrategy.GCS;
+
+  options: CommonOptions & {
+    bucket: string;
+    keyFile?: string;
+    apiEndPoint?: string;
+    projectId?: string;
+    uploadOptionFactory?: CustomProvider<GCSUploadOptionFactory>;
   };
 }
 
