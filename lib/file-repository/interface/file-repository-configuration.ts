@@ -31,7 +31,12 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
 export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.GCS;
 
-  options?: CommonOptions;
+  options: CommonOptions & {
+    bucket: string;
+    keyFile?: string;
+    apiEndPoint?: string;
+    projectId?: string;
+  };
 }
 
 export interface DiskFileRepositoryConfiguration extends CommonConfiguration {

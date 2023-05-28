@@ -8,3 +8,13 @@ services:
       - "./scripts/localstack-init:/docker-entrypoint-initaws.d"
     environment:
       - SERVICES=s3
+
+  google-cloud:
+    image: fsouza/fake-gcs-server
+    container_name: google-cloud
+    ports:
+      - 8080:8080
+    volumes:
+      - ./scripts/google-cloud-sdk/data:/data
+    command: [ "-scheme", "http", "-port", "8080", "-external-url", "http://localhost:8080", "-backend", "memory" ]
+
