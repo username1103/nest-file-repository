@@ -51,4 +51,46 @@ export class DiskFileRepository implements FileRepository {
 
     return filePath;
   }
+
+  async get(key: string): Promise<File | null> {
+    try {
+      const fileStat = await fs.stat(key);
+
+      if (!fileStat.isFile()) {
+        return null;
+      }
+
+      const options: ObjectEncodingOptions & {
+        mode?: Mode;
+        flag?: OpenMode;
+      } & Abortable = {
+        flag: 'r',
+      };
+
+      if (this.config.options?.timeout) {
+        options.signal = AbortSignal.timeout(this.config.options.timeout);
+      }
+
+      const fileContents = await fs.readFile(key, options);
+
+      return new File(
+        key,
+        typeof fileContents === 'string'
+          ? Buffer.from(fileContents)
+          : fileContents,
+      );
+    } catch (e) {
+      if ((e as any)?.code === 'ENOENT') {
+        return null;
+      }
+
+      if ((e as any).name === 'AbortError') {
+        throw new TimeoutException(
+          `raise timeout: ${this.config.options?.timeout}ms`,
+        );
+      }
+
+      throw e;
+    }
+  }
 }
