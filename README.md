@@ -23,6 +23,24 @@ npm install nest-file-repository
 yarn add nest-file-repository
 ```
 
+If you want to use `S3FileRepository`, you have to install `@aws-sdk/client-s3`.
+```bash
+npm install nest-file-repository @aws-sdk/client-s3
+```
+
+```bash
+yarn add nest-file-repository @aws-sdk/client-s3
+```
+
+If you want to use `GCSFileRepository`, you have to install `@google-cloud/storage`
+```bash
+npm install nest-file-repository @google-cloud/storage
+```
+
+```bash
+yarn add nest-file-repository @google-cloud/storage
+```
+
 ## Usage
 
 First, the module we created must be imported into your module
