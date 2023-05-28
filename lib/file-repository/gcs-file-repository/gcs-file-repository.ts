@@ -1,7 +1,7 @@
 import path from 'path';
 
 import { Storage } from '@google-cloud/storage';
-import { ApiError } from '@google-cloud/storage/build/src/nodejs-common/util';
+import { ApiError } from '@google-cloud/storage/build/src/nodejs-common';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
@@ -59,7 +59,7 @@ export class GCSFileRepository implements FileRepository {
         );
       }
 
-      if (e instanceof ApiError && (e as any).code === 404) {
+      if (e instanceof ApiError && e.code === 404) {
         throw new NoSuchBucketException(
           `not exists bucket: ${this.config.options.bucket}`,
         );
