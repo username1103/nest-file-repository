@@ -1,5 +1,6 @@
-/** @type {import('jest').Config} */
-const config = {
+import type { Config } from 'jest';
+
+const config: Config = {
   verbose: true,
   testRegex: '.*\\.spec\\.ts$',
   transform: {
@@ -12,4 +13,4 @@ const config = {
   setupFiles: ['../jest.setup.ts'],
 };
 
-module.exports = config;
+export default config;
