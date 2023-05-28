@@ -22,6 +22,10 @@ import {
   S3UploadOptionFactory,
 } from '../interface/s3-upload-option-factory';
 
+// const { S3Client, PutObjectCommand } = optionalRequire('@aws-sdk/client-s3');
+//
+// const { NodeHttpHandler } = optionalRequire('@aws-sdk/node-http-handler');
+
 @Injectable()
 export class S3FileRepository implements FileRepository {
   private readonly client: S3Client;
