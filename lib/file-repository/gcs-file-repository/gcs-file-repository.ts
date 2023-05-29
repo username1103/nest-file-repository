@@ -46,11 +46,13 @@ export class GCSFileRepository implements FileRepository {
     );
     try {
       await this.client
-        .bucket(options.Bucket)
+        .bucket(options.bucket)
         .file(options.fileName)
         .save(options.fileData, {
           timeout: this.config.options.timeout,
           resumable: options.resumable,
+          contentType: options.contentType,
+          predefinedAcl: options.acl,
         });
     } catch (e) {
       if (!(e instanceof Error)) {
@@ -82,7 +84,7 @@ export class GCSFileRepository implements FileRepository {
       if (
         e instanceof ApiError &&
         e.code === 404 &&
-        !(await this.client.bucket(options.Bucket).exists())[0]
+        !(await this.client.bucket(options.bucket).exists())[0]
       ) {
         throw new NoSuchBucketException(
           `not exists bucket: ${this.config.options.bucket}`,

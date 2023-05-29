@@ -1,7 +1,7 @@
 import { S3FileRepositoryConfiguration } from './file-repository-configuration';
 import { Mimetype } from '../../constant';
 import { File } from '../../File';
-import { Acl } from '../constant';
+import { S3Acl } from '../constant';
 
 export const S3_UPLOAD_OPTION_FACTORY = Symbol('S3_UPLOAD_OPTION_FACTORY');
 
@@ -9,7 +9,7 @@ export type S3UploadOption = {
   Bucket: string;
   Key: string;
   Body: Buffer;
-  ACL?: Acl;
+  ACL?: S3Acl;
   ContentType?: Mimetype | string;
   CacheControl?: string;
   ContentDisposition?: string;
