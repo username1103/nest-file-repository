@@ -45,7 +45,9 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
 export interface DiskFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.DISK;
 
-  options?: CommonOptions;
+  options?: CommonOptions & {
+    url?: URL;
+  };
 }
 
 export interface MemoryFileRepositoryConfiguration extends CommonConfiguration {

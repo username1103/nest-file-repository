@@ -123,4 +123,33 @@ describe('DiskFileService', () => {
       );
     });
   });
+
+  describe('getUrl', () => {
+    it('return url for getting file', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: {
+          url: new URL('https://example.com'),
+        },
+      });
+      // when
+      const url = await diskFileRepository.getUrl('test.txt');
+
+      // then
+      expect(url).toBe('https://example.com/test.txt');
+    });
+
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when, then
+      await expect(() => diskFileRepository.getUrl('test.txt')).rejects.toThrow(
+        Error,
+      );
+    });
+  });
 });

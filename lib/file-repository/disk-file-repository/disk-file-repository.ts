@@ -93,4 +93,14 @@ export class DiskFileRepository implements FileRepository {
       throw e;
     }
   }
+
+  async getUrl(key: string): Promise<string> {
+    if (!this.config.options?.url) {
+      throw new Error(
+        'You need to set the url option in configuration for "getUrl"',
+      );
+    }
+
+    return new URL(key, this.config.options.url).href;
+  }
 }
