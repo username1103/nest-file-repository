@@ -8,7 +8,7 @@ export type GCSUploadOption = {
   Bucket: string;
   fileName: string;
   fileData: Buffer;
-  ContentType?: Mimetype;
+  ContentType?: Mimetype | string;
   resumable: boolean;
 };
 

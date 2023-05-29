@@ -16,7 +16,6 @@ export const getFileRepository = (
     case UploadStrategy.S3:
       const { S3FileRepository } = lazyLoadPackage(
         './s3-file-repository/s3-file-repository',
-        getFileRepository.name,
         () => require('./s3-file-repository/s3-file-repository'),
       );
 
@@ -24,7 +23,6 @@ export const getFileRepository = (
     case UploadStrategy.GCS:
       const { GCSFileRepository } = lazyLoadPackage(
         './gcs-file-repository/gcs-file-repository',
-        getFileRepository.name,
         () => require('./gcs-file-repository/gcs-file-repository'),
       );
 

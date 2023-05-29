@@ -10,11 +10,10 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
 import {
-  InvalidAccessKeyIdException,
   NoSuchBucketException,
   NotAllowedAclException,
-  SignatureDoesNotMatchedException,
   TimeoutException,
+  InvalidAccessKeyException,
 } from '../exception';
 import { FileRepository } from '../file-repository';
 import {
@@ -88,13 +87,13 @@ export class S3FileRepository implements FileRepository {
       }
 
       if (e.name === 'InvalidAccessKeyId') {
-        throw new InvalidAccessKeyIdException(
+        throw new InvalidAccessKeyException(
           `invalid accessKey Id: ${this.config.options.credentials.accessKeyId}`,
         );
       }
 
       if (e.name === 'SignatureDoesNotMatch') {
-        throw new SignatureDoesNotMatchedException(
+        throw new InvalidAccessKeyException(
           `secretAccessKey does not matched: ${this.config.options.credentials.secretAccessKey}`,
         );
       }
@@ -141,13 +140,13 @@ export class S3FileRepository implements FileRepository {
       }
 
       if (e.name === 'InvalidAccessKeyId') {
-        throw new InvalidAccessKeyIdException(
+        throw new InvalidAccessKeyException(
           `invalid accessKey Id: ${this.config.options.credentials.accessKeyId}`,
         );
       }
 
       if (e.name === 'SignatureDoesNotMatch') {
-        throw new SignatureDoesNotMatchedException(
+        throw new InvalidAccessKeyException(
           `secretAccessKey does not matched: ${this.config.options.credentials.secretAccessKey}`,
         );
       }
