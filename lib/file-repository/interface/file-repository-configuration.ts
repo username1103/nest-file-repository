@@ -51,7 +51,9 @@ export interface DiskFileRepositoryConfiguration extends CommonConfiguration {
 export interface MemoryFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.MEMORY;
 
-  options?: CommonOptions;
+  options?: CommonOptions & {
+    url?: URL;
+  };
 }
 
 export interface CommonOptions {

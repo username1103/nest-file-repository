@@ -95,4 +95,33 @@ describe('MemoryFileRepository', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('getUrl', () => {
+    it('return url for getting file', async () => {
+      // given
+      const memoryFileRepository = new MemoryFileRepository({
+        strategy: UploadStrategy.MEMORY,
+        options: {
+          url: new URL('https://example.com'),
+        },
+      });
+      // when
+      const url = await memoryFileRepository.getUrl('test.txt');
+
+      // then
+      expect(url).toBe('https://example.com/test.txt');
+    });
+
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const memoryFileRepository = new MemoryFileRepository({
+        strategy: UploadStrategy.MEMORY,
+      });
+
+      // when, then
+      await expect(() =>
+        memoryFileRepository.getUrl('test.txt'),
+      ).rejects.toThrow(Error);
+    });
+  });
 });

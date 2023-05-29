@@ -24,7 +24,17 @@ export class MemoryFileRepository implements FileRepository {
     return filePath;
   }
 
-  async get(filePath: string): Promise<File | null> {
-    return this.storage.get(filePath) ?? null;
+  async get(key: string): Promise<File | null> {
+    return this.storage.get(key) ?? null;
+  }
+
+  async getUrl(key: string): Promise<string> {
+    if (!this.config.options?.url) {
+      throw new Error(
+        'You need to set the url option in configuration for "getUrl"',
+      );
+    }
+
+    return new URL(key, this.config.options.url).href;
   }
 }
