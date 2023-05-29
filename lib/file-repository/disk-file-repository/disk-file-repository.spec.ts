@@ -6,7 +6,7 @@ import { File } from '../../File';
 import { expectNonNullable } from '../../test/expect/expect-non-nullable';
 import { TimeoutException } from '../exception';
 
-describe('DiskFileService', () => {
+describe('DiskFileRepository', () => {
   describe('save', () => {
     it('save file in disk', async () => {
       // given
@@ -130,7 +130,7 @@ describe('DiskFileService', () => {
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
         options: {
-          url: new URL('https://example.com'),
+          endPoint: new URL('https://example.com'),
         },
       });
       // when

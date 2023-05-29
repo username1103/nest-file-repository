@@ -23,7 +23,7 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
     };
     bucket: string;
     acl?: S3Acl;
-    endPoint?: string;
+    endPoint?: URL;
     forcePathStyle?: boolean;
     uploadOptionFactory?: CustomProvider<S3UploadOptionFactory>;
   };
@@ -46,7 +46,7 @@ export interface DiskFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.DISK;
 
   options?: CommonOptions & {
-    url?: URL;
+    endPoint?: URL;
   };
 }
 
@@ -54,7 +54,7 @@ export interface MemoryFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.MEMORY;
 
   options?: CommonOptions & {
-    url?: URL;
+    endPoint?: URL;
   };
 }
 

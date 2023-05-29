@@ -36,7 +36,7 @@ export class S3FileRepository implements FileRepository {
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
-      endpoint: this.config.options.endPoint,
+      endpoint: this.config.options.endPoint?.href,
       forcePathStyle: this.config.options.forcePathStyle,
       credentials: {
         accessKeyId: this.config.options.credentials.accessKeyId,

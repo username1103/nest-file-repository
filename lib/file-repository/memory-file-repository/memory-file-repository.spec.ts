@@ -102,7 +102,7 @@ describe('MemoryFileRepository', () => {
       const memoryFileRepository = new MemoryFileRepository({
         strategy: UploadStrategy.MEMORY,
         options: {
-          url: new URL('https://example.com'),
+          endPoint: new URL('https://example.com'),
         },
       });
       // when
