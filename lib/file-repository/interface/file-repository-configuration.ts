@@ -2,7 +2,7 @@ import { GCSUploadOptionFactory } from './gcs-upload-option-factory';
 import { S3UploadOptionFactory } from './s3-upload-option-factory';
 import { UploadStrategy } from '../../enum';
 import { CustomProvider } from '../../interface/custom-provider';
-import { S3Acl } from '../constant';
+import { GCSAcl, S3Acl } from '../constant';
 
 export const CONFIG = Symbol('CONFIG');
 
@@ -37,6 +37,7 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
     keyFile?: string;
     apiEndPoint?: string;
     projectId?: string;
+    acl?: GCSAcl;
     uploadOptionFactory?: CustomProvider<GCSUploadOptionFactory>;
   };
 }

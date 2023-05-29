@@ -51,14 +51,22 @@ export class S3FileRepository implements FileRepository {
   async save(file: File): Promise<string> {
     const filePath = path.join(this.config.options?.path ?? '', file.filename);
 
+    const options = this.s3UploadOptionFactory.getOptions(
+      new File(filePath, file.data, file.mimetype),
+      this.config,
+    );
+
     try {
       await this.client.send(
-        new PutObjectCommand(
-          this.s3UploadOptionFactory.getOptions(
-            new File(filePath, file.data, file.mimetype),
-            this.config,
-          ),
-        ),
+        new PutObjectCommand({
+          Bucket: options.bucket,
+          Key: options.key,
+          ACL: options.acl,
+          ContentType: options.contentType,
+          CacheControl: options.cacheControl,
+          ContentDisposition: options.contentDisposition,
+          Body: options.body,
+        }),
       );
     } catch (e) {
       if (!(e instanceof Error)) {

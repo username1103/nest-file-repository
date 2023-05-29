@@ -6,13 +6,13 @@ import { S3Acl } from '../constant';
 export const S3_UPLOAD_OPTION_FACTORY = Symbol('S3_UPLOAD_OPTION_FACTORY');
 
 export type S3UploadOption = {
-  Bucket: string;
-  Key: string;
-  Body: Buffer;
-  ACL?: S3Acl;
-  ContentType?: Mimetype | string;
-  CacheControl?: string;
-  ContentDisposition?: string;
+  bucket: string;
+  key: string;
+  body: Buffer;
+  acl?: S3Acl;
+  contentType?: Mimetype | string;
+  cacheControl?: string;
+  contentDisposition?: string;
 };
 
 export interface S3UploadOptionFactory {
