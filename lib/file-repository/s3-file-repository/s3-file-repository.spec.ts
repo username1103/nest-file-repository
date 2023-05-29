@@ -248,4 +248,84 @@ describe('S3FileRepository', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('getUrl', () => {
+    it('return url for getting file', async () => {
+      // given
+      const s3FileRepository = new S3FileRepository(
+        {
+          strategy: UploadStrategy.S3,
+          options: {
+            bucket: 'test-bucket',
+            credentials: {
+              accessKeyId: 'test',
+              secretAccessKey: 'test',
+            },
+            region: 'ap-northeast-2',
+          },
+        },
+        new DefaultS3UploadOptionFactory(),
+      );
+
+      // when
+      const result = await s3FileRepository.getUrl('test.txt');
+
+      // then
+      expect(result).toBe(
+        `https://test-bucket.s3.ap-northeast-2.amazonaws.com/test.txt`,
+      );
+    });
+
+    it('return url for getting file with forcePathStyle', async () => {
+      // given
+      const s3FileRepository = new S3FileRepository(
+        {
+          strategy: UploadStrategy.S3,
+          options: {
+            bucket: 'test-bucket',
+            credentials: {
+              accessKeyId: 'test',
+              secretAccessKey: 'test',
+            },
+            region: 'ap-northeast-2',
+            forcePathStyle: true,
+          },
+        },
+        new DefaultS3UploadOptionFactory(),
+      );
+
+      // when
+      const result = await s3FileRepository.getUrl('test.txt');
+
+      // then
+      expect(result).toBe(
+        `https://s3.ap-northeast-2.amazonaws.com/test-bucket/test.txt`,
+      );
+    });
+
+    it('return url for getting file with endPoint', async () => {
+      // given
+      const s3FileRepository = new S3FileRepository(
+        {
+          strategy: UploadStrategy.S3,
+          options: {
+            bucket: 'test-bucket',
+            credentials: {
+              accessKeyId: 'test',
+              secretAccessKey: 'test',
+            },
+            region: 'ap-northeast-2',
+            endPoint: 'http://localhost:4566',
+          },
+        },
+        new DefaultS3UploadOptionFactory(),
+      );
+
+      // when
+      const result = await s3FileRepository.getUrl('test.txt');
+
+      // then
+      expect(result).toBe(`http://localhost:4566/test.txt`);
+    });
+  });
 });

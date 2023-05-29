@@ -10,10 +10,10 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
 import {
+  InvalidAccessKeyException,
   NoSuchBucketException,
   NotAllowedAclException,
   TimeoutException,
-  InvalidAccessKeyException,
 } from '../exception';
 import { FileRepository } from '../file-repository';
 import {
@@ -161,5 +161,34 @@ export class S3FileRepository implements FileRepository {
 
       throw e;
     }
+  }
+
+  async getUrl(key: string): Promise<string> {
+    if (this.config.options.endPoint) {
+      return new URL(key, this.config.options.endPoint).href;
+    }
+
+    if (this.config.options.forcePathStyle) {
+      return new URL(
+        `${this.config.options.bucket}/${key}`,
+        this.getDefaultPathStyleEndPoint(this.config.options.region),
+      ).href;
+    }
+
+    return new URL(
+      key,
+      this.getHostStyleEndPoint(
+        this.config.options.bucket,
+        this.config.options.region,
+      ),
+    ).href;
+  }
+
+  private getDefaultPathStyleEndPoint(region: string): string {
+    return `https://s3.${region}.amazonaws.com`;
+  }
+
+  private getHostStyleEndPoint(bucket: string, region: string): string {
+    return `https://${bucket}.s3.${region}.amazonaws.com`;
   }
 }
