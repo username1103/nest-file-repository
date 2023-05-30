@@ -35,7 +35,7 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
   options: CommonOptions & {
     bucket: string;
     keyFile?: string;
-    apiEndPoint?: string;
+    apiEndPoint?: URL;
     projectId?: string;
     acl?: GCSAcl;
     uploadOptionFactory?: CustomProvider<GCSUploadOptionFactory>;

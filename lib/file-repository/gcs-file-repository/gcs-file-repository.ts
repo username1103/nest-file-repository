@@ -5,10 +5,11 @@ import { ApiError } from '@google-cloud/storage/build/src/nodejs-common';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
+import { normalizePath } from '../../util/shared.util';
 import {
+  InvalidAccessKeyException,
   NoSuchBucketException,
   TimeoutException,
-  InvalidAccessKeyException,
 } from '../exception';
 import { FileRepository } from '../file-repository';
 import {
@@ -31,7 +32,7 @@ export class GCSFileRepository implements FileRepository {
   ) {
     this.client = new Storage({
       keyFilename: this.config.options.keyFile,
-      apiEndpoint: config.options.apiEndPoint,
+      apiEndpoint: config.options.apiEndPoint?.href,
       projectId: config.options.projectId,
       timeout: config.options.timeout,
     });
@@ -148,5 +149,22 @@ export class GCSFileRepository implements FileRepository {
 
       throw e;
     }
+  }
+
+  async getUrl(key: string): Promise<string> {
+    if (this.config.options.apiEndPoint) {
+      return new URL(
+        normalizePath(`${this.config.options.apiEndPoint.pathname}/${key}`),
+        this.config.options.apiEndPoint,
+      ).href;
+    }
+    return new URL(
+      normalizePath(`${`/${this.config.options.bucket}`}/${key}`),
+      this.getDefaultEndPoint(),
+    ).href;
+  }
+
+  private getDefaultEndPoint(): string {
+    return `https://storage.googleapis.com`;
   }
 }

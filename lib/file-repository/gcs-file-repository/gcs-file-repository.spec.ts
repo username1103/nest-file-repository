@@ -13,7 +13,7 @@ describe('GCSFileRepository', () => {
       const config: GCSFileRepositoryConfiguration = {
         strategy: UploadStrategy.GCS,
         options: {
-          apiEndPoint: 'http://localhost:8080',
+          apiEndPoint: new URL('http://localhost:8080'),
           projectId: 'test',
           bucket: 'test-bucket',
           path: '/test',
@@ -38,7 +38,7 @@ describe('GCSFileRepository', () => {
       const config: GCSFileRepositoryConfiguration = {
         strategy: UploadStrategy.GCS,
         options: {
-          apiEndPoint: 'http://localhost:8080',
+          apiEndPoint: new URL('http://localhost:8080'),
           projectId: 'test',
           bucket: 'test-bucket',
         },
@@ -62,7 +62,7 @@ describe('GCSFileRepository', () => {
       const config: GCSFileRepositoryConfiguration = {
         strategy: UploadStrategy.GCS,
         options: {
-          apiEndPoint: 'http://localhost:8080',
+          apiEndPoint: new URL('http://localhost:8080'),
           projectId: 'test',
           bucket: 'test-bucket',
           timeout: 1,
@@ -86,7 +86,7 @@ describe('GCSFileRepository', () => {
       const config: GCSFileRepositoryConfiguration = {
         strategy: UploadStrategy.GCS,
         options: {
-          apiEndPoint: 'http://localhost:8080',
+          apiEndPoint: new URL('http://localhost:8080'),
           projectId: 'test',
           bucket: 'test-bucket2',
         },
@@ -113,7 +113,7 @@ describe('GCSFileRepository', () => {
           strategy: UploadStrategy.GCS,
           options: {
             bucket: 'test-bucket',
-            apiEndPoint: 'http://localhost:8080',
+            apiEndPoint: new URL('http://localhost:8080'),
           },
         },
         new DefaultGCSUploadOptionFactory(),
@@ -135,7 +135,7 @@ describe('GCSFileRepository', () => {
           strategy: UploadStrategy.GCS,
           options: {
             bucket: 'test-bucket',
-            apiEndPoint: 'http://localhost:8080',
+            apiEndPoint: new URL('http://localhost:8080'),
           },
         },
         new DefaultGCSUploadOptionFactory(),
@@ -146,6 +146,49 @@ describe('GCSFileRepository', () => {
 
       // then
       expect(result).toBe(null);
+    });
+  });
+
+  describe('getUrl', () => {
+    it('return url for getting file', async () => {
+      // given
+      const gcsFileRepository = new GCSFileRepository(
+        {
+          strategy: UploadStrategy.GCS,
+          options: {
+            bucket: 'test-bucket',
+          },
+        },
+        new DefaultGCSUploadOptionFactory(),
+      );
+
+      // when
+      const result = await gcsFileRepository.getUrl('/test/test.txt');
+
+      // then
+      expect(result).toBe(
+        `https://storage.googleapis.com/test-bucket/test/test.txt`,
+      );
+    });
+
+    it('return url for getting file with endPoint', async () => {
+      // given
+      const gcsFileRepository = new GCSFileRepository(
+        {
+          strategy: UploadStrategy.GCS,
+          options: {
+            bucket: 'test-bucket',
+            apiEndPoint: new URL('http://localhost:8080/path'),
+          },
+        },
+        new DefaultGCSUploadOptionFactory(),
+      );
+
+      // when
+      const result = await gcsFileRepository.getUrl('test.txt');
+
+      // then
+      expect(result).toBe(`http://localhost:8080/path/test.txt`);
     });
   });
 });
