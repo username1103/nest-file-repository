@@ -295,11 +295,11 @@ describe('S3FileRepository', () => {
       );
 
       // when
-      const result = await s3FileRepository.getUrl('test.txt');
+      const result = await s3FileRepository.getUrl('/path1/test.txt');
 
       // then
       expect(result).toBe(
-        `https://s3.ap-northeast-2.amazonaws.com/test-bucket/test.txt`,
+        `https://s3.ap-northeast-2.amazonaws.com/test-bucket/path1/test.txt`,
       );
     });
 
@@ -315,17 +315,17 @@ describe('S3FileRepository', () => {
               secretAccessKey: 'test',
             },
             region: 'ap-northeast-2',
-            endPoint: new URL('http://localhost:4566'),
+            endPoint: new URL('http://localhost:4566/test/test'),
           },
         },
         new DefaultS3UploadOptionFactory(),
       );
 
       // when
-      const result = await s3FileRepository.getUrl('test.txt');
+      const result = await s3FileRepository.getUrl('/path1/test.txt');
 
       // then
-      expect(result).toBe(`http://localhost:4566/test.txt`);
+      expect(result).toBe(`http://localhost:4566/test/test/path1/test.txt`);
     });
   });
 });

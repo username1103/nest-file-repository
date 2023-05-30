@@ -130,14 +130,14 @@ describe('DiskFileRepository', () => {
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
         options: {
-          endPoint: new URL('https://example.com'),
+          endPoint: new URL('https://example.com/path1'),
         },
       });
       // when
-      const url = await diskFileRepository.getUrl('test.txt');
+      const url = await diskFileRepository.getUrl('/path/path/test.txt');
 
       // then
-      expect(url).toBe('https://example.com/test.txt');
+      expect(url).toBe('https://example.com/path1/path/path/test.txt');
     });
 
     it('throw Error if url option does not exists', async () => {

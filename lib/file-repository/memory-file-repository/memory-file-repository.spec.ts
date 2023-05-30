@@ -102,14 +102,14 @@ describe('MemoryFileRepository', () => {
       const memoryFileRepository = new MemoryFileRepository({
         strategy: UploadStrategy.MEMORY,
         options: {
-          endPoint: new URL('https://example.com'),
+          endPoint: new URL('https://example.com/path1/path2'),
         },
       });
       // when
-      const url = await memoryFileRepository.getUrl('test.txt');
+      const url = await memoryFileRepository.getUrl('/path2/test.txt');
 
       // then
-      expect(url).toBe('https://example.com/test.txt');
+      expect(url).toBe('https://example.com/path1/path2/path2/test.txt');
     });
 
     it('throw Error if url option does not exists', async () => {

@@ -3,6 +3,7 @@ import path from 'path';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
+import { normalizePath } from '../../util/shared.util';
 import { FileRepository } from '../file-repository';
 import {
   CONFIG,
@@ -35,6 +36,9 @@ export class MemoryFileRepository implements FileRepository {
       );
     }
 
-    return new URL(key, this.config.options.endPoint).href;
+    return new URL(
+      normalizePath(`${this.config.options.endPoint.pathname}/${key}`),
+      this.config.options.endPoint,
+    ).href;
   }
 }

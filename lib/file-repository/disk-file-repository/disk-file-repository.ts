@@ -6,6 +6,7 @@ import * as path from 'path';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
+import { normalizePath } from '../../util/shared.util';
 import { TimeoutException } from '../exception';
 import { FileRepository } from '../file-repository';
 import {
@@ -101,6 +102,9 @@ export class DiskFileRepository implements FileRepository {
       );
     }
 
-    return new URL(key, this.config.options.endPoint).href;
+    return new URL(
+      normalizePath(`${this.config.options.endPoint.pathname}/${key}`),
+      this.config.options.endPoint,
+    ).href;
   }
 }

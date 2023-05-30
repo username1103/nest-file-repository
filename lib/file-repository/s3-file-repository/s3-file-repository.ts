@@ -9,6 +9,7 @@ import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
+import { normalizePath } from '../../util/shared.util';
 import {
   InvalidAccessKeyException,
   NoSuchBucketException,
@@ -165,12 +166,15 @@ export class S3FileRepository implements FileRepository {
 
   async getUrl(key: string): Promise<string> {
     if (this.config.options.endPoint) {
-      return new URL(key, this.config.options.endPoint).href;
+      return new URL(
+        normalizePath(`${this.config.options.endPoint.pathname}/${key}`),
+        this.config.options.endPoint,
+      ).href;
     }
 
     if (this.config.options.forcePathStyle) {
       return new URL(
-        `${this.config.options.bucket}/${key}`,
+        normalizePath(`/${this.config.options.bucket}/${key}`),
         this.getDefaultPathStyleEndPoint(this.config.options.region),
       ).href;
     }
