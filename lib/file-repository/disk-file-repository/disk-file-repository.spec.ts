@@ -95,6 +95,19 @@ describe('DiskFileRepository', () => {
       expect(file.data).toBeDefined();
     });
 
+    it('return null if target is directory', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when
+      const file = await diskFileRepository.get('scripts');
+
+      // then
+      expect(file).toBeNull();
+    });
+
     it('return null if file does not exist', async () => {
       // given
       const diskFileRepository = new DiskFileRepository({
