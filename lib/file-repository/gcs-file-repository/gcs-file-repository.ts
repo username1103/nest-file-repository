@@ -154,14 +154,42 @@ export class GCSFileRepository implements FileRepository {
   async getUrl(key: string): Promise<string> {
     if (this.config.options.apiEndPoint) {
       return new URL(
-        normalizePath(`${this.config.options.apiEndPoint.pathname}/${key}`),
+        normalizePath(
+          `${this.config.options.apiEndPoint.pathname}/${this.config.options.bucket}/${key}`,
+        ),
         this.config.options.apiEndPoint,
       ).href;
     }
     return new URL(
-      normalizePath(`${`/${this.config.options.bucket}`}/${key}`),
+      normalizePath(`/${this.config.options.bucket}/${key}`),
       this.getDefaultEndPoint(),
     ).href;
+  }
+
+  async getSignedUrlForRead(key: string): Promise<string> {
+    const [signedUrl] = await this.client
+      .bucket(this.config.options.bucket)
+      .file(key)
+      .getSignedUrl({
+        action: 'read',
+        expires:
+          Date.now() + (this.config.options.signedUrlExpires ?? 3600) * 1000,
+      });
+
+    return signedUrl;
+  }
+
+  async getSignedUrlForUpload(key: string): Promise<string> {
+    const [signedUrl] = await this.client
+      .bucket(this.config.options.bucket)
+      .file(key)
+      .getSignedUrl({
+        action: 'write',
+        expires:
+          Date.now() + (this.config.options.signedUrlExpires ?? 3600) * 1000,
+      });
+
+    return signedUrl;
   }
 
   private getDefaultEndPoint(): string {

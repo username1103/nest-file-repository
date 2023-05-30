@@ -42,7 +42,11 @@ export class MemoryFileRepository implements FileRepository {
     ).href;
   }
 
-  async getSignedUrl(key: string): Promise<string> {
+  async getSignedUrlForRead(key: string): Promise<string> {
     return this.getUrl(key);
+  }
+
+  async getSignedUrlForUpload(key: string): Promise<string> {
+    return await this.getSignedUrlForRead(key);
   }
 }

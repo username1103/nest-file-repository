@@ -185,7 +185,7 @@ export class S3FileRepository implements FileRepository {
     return new URL(normalizePath(`${endPoint.pathname}/${key}`), endPoint).href;
   }
 
-  async getSignedUrl(key: string): Promise<string> {
+  async getSignedUrlForRead(key: string): Promise<string> {
     return await getSignedUrl(
       this.client,
       new GetObjectCommand({
@@ -193,9 +193,13 @@ export class S3FileRepository implements FileRepository {
         Key: key,
       }),
       {
-        expiresIn: 3600,
+        expiresIn: this.config.options.signedUrlExpires ?? 3600,
       },
     );
+  }
+
+  async getSignedUrlForUpload(key: string): Promise<string> {
+    return await this.getSignedUrlForRead(key);
   }
 
   private getPathStyleEndPoint(

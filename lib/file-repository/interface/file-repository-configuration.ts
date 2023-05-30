@@ -26,6 +26,7 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
     endPoint?: URL;
     forcePathStyle?: boolean;
     uploadOptionFactory?: CustomProvider<S3UploadOptionFactory>;
+    signedUrlExpires?: number;
   };
 }
 
@@ -39,6 +40,7 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
     projectId?: string;
     acl?: GCSAcl;
     uploadOptionFactory?: CustomProvider<GCSUploadOptionFactory>;
+    signedUrlExpires?: number;
   };
 }
 

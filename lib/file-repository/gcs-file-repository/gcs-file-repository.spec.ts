@@ -188,7 +188,7 @@ describe('GCSFileRepository', () => {
       const result = await gcsFileRepository.getUrl('test.txt');
 
       // then
-      expect(result).toBe(`http://localhost:8080/path/test.txt`);
+      expect(result).toBe(`http://localhost:8080/path/test-bucket/test.txt`);
     });
   });
 });

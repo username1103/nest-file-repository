@@ -359,7 +359,7 @@ describe('S3FileRepository', () => {
     });
   });
 
-  describe('getSignedUrl', () => {
+  describe('getSignedUrlForRead', () => {
     it('return signedUrl from key', async () => {
       // given
       const s3FileRepository = new S3FileRepository(
@@ -377,7 +377,7 @@ describe('S3FileRepository', () => {
         new DefaultS3UploadOptionFactory(),
       );
       // when
-      const result = await s3FileRepository.getSignedUrl('test.txt');
+      const result = await s3FileRepository.getSignedUrlForRead('test.txt');
 
       // then
       expect(result).not.toBe(
@@ -408,7 +408,7 @@ describe('S3FileRepository', () => {
         new DefaultS3UploadOptionFactory(),
       );
       // when
-      const result = await s3FileRepository.getSignedUrl('test.txt');
+      const result = await s3FileRepository.getSignedUrlForRead('test.txt');
 
       // then
       expect(result).not.toBe(
@@ -440,7 +440,9 @@ describe('S3FileRepository', () => {
       );
 
       // when
-      const result = await s3FileRepository.getSignedUrl('path1/test.txt');
+      const result = await s3FileRepository.getSignedUrlForRead(
+        'path1/test.txt',
+      );
 
       // then
       expect(result).not.toBe(
@@ -473,7 +475,9 @@ describe('S3FileRepository', () => {
       );
 
       // when
-      const result = await s3FileRepository.getSignedUrl('path1/test.txt');
+      const result = await s3FileRepository.getSignedUrlForRead(
+        'path1/test.txt',
+      );
 
       // then
       expect(result).not.toBe(
