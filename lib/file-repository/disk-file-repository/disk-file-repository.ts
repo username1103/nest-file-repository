@@ -107,4 +107,8 @@ export class DiskFileRepository implements FileRepository {
       this.config.options.endPoint,
     ).href;
   }
+
+  async getSignedUrl(key: string): Promise<string> {
+    return this.getUrl(key);
+  }
 }

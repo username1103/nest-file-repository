@@ -6,6 +6,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
@@ -165,34 +166,57 @@ export class S3FileRepository implements FileRepository {
   }
 
   async getUrl(key: string): Promise<string> {
-    if (this.config.options.endPoint) {
-      return new URL(
-        normalizePath(`${this.config.options.endPoint.pathname}/${key}`),
-        this.config.options.endPoint,
-      ).href;
-    }
+    const endPoint = this.config.options.forcePathStyle
+      ? new URL(
+          this.getPathStyleEndPoint(
+            this.config.options.bucket,
+            this.config.options.region,
+            this.config.options.endPoint,
+          ),
+        )
+      : new URL(
+          this.getHostStyleEndPoint(
+            this.config.options.bucket,
+            this.config.options.region,
+            this.config.options.endPoint,
+          ),
+        );
 
-    if (this.config.options.forcePathStyle) {
-      return new URL(
-        normalizePath(`/${this.config.options.bucket}/${key}`),
-        this.getDefaultPathStyleEndPoint(this.config.options.region),
-      ).href;
-    }
-
-    return new URL(
-      key,
-      this.getHostStyleEndPoint(
-        this.config.options.bucket,
-        this.config.options.region,
-      ),
-    ).href;
+    return new URL(normalizePath(`${endPoint.pathname}/${key}`), endPoint).href;
   }
 
-  private getDefaultPathStyleEndPoint(region: string): string {
-    return `https://s3.${region}.amazonaws.com`;
+  async getSignedUrl(key: string): Promise<string> {
+    return await getSignedUrl(
+      this.client,
+      new GetObjectCommand({
+        Bucket: this.config.options.bucket,
+        Key: key,
+      }),
+      {
+        expiresIn: 3600,
+      },
+    );
   }
 
-  private getHostStyleEndPoint(bucket: string, region: string): string {
+  private getPathStyleEndPoint(
+    bucket: string,
+    region: string,
+    endPoint?: URL,
+  ): string {
+    return `${
+      endPoint?.toString() ?? `https://s3.${region}.amazonaws.com`
+    }/${bucket}`;
+  }
+
+  private getHostStyleEndPoint(
+    bucket: string,
+    region: string,
+    endPoint?: URL,
+  ): string {
+    if (endPoint) {
+      return `${endPoint.protocol}//${bucket}.${endPoint.host}${endPoint.pathname}`;
+    }
+
     return `https://${bucket}.s3.${region}.amazonaws.com`;
   }
 }
