@@ -1,5 +1,4 @@
 import { GCSFileRepositoryConfiguration } from './file-repository-configuration';
-import { Mimetype } from '../../constant';
 import { File } from '../../File';
 import { GCSAcl } from '../constant';
 
@@ -10,7 +9,7 @@ export type GCSUploadOption = {
   fileName: string;
   fileData: Buffer;
   resumable: boolean;
-  contentType?: Mimetype | string;
+  contentType?: string;
   acl?: GCSAcl;
 };
 

@@ -1,5 +1,4 @@
 import { S3FileRepositoryConfiguration } from './file-repository-configuration';
-import { Mimetype } from '../../constant';
 import { File } from '../../File';
 import { S3Acl } from '../constant';
 
@@ -10,7 +9,7 @@ export type S3UploadOption = {
   key: string;
   body: Buffer;
   acl?: S3Acl;
-  contentType?: Mimetype | string;
+  contentType?: string;
   cacheControl?: string;
   contentDisposition?: string;
 };
