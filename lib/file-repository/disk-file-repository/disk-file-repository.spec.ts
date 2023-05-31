@@ -165,4 +165,66 @@ describe('DiskFileRepository', () => {
       );
     });
   });
+
+  describe('getSignedUrlForRead', () => {
+    it('return url for getting file', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: {
+          endPoint: new URL('https://example.com/path1'),
+        },
+      });
+      // when
+      const url = await diskFileRepository.getSignedUrlForRead(
+        '/path/path/test.txt',
+      );
+
+      // then
+      expect(url).toBe('https://example.com/path1/path/path/test.txt');
+    });
+
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when, then
+      await expect(() =>
+        diskFileRepository.getSignedUrlForRead('test.txt'),
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getSignedUrlForUpload', () => {
+    it('return url for getting file', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: {
+          endPoint: new URL('https://example.com/path1'),
+        },
+      });
+      // when
+      const url = await diskFileRepository.getSignedUrlForUpload(
+        '/path/path/test.txt',
+      );
+
+      // then
+      expect(url).toBe('https://example.com/path1/path/path/test.txt');
+    });
+
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when, then
+      await expect(() =>
+        diskFileRepository.getSignedUrlForUpload('test.txt'),
+      ).rejects.toThrow(Error);
+    });
+  });
 });

@@ -124,4 +124,66 @@ describe('MemoryFileRepository', () => {
       ).rejects.toThrow(Error);
     });
   });
+
+  describe('getSignedUrlForRead', () => {
+    it('return url for getting file', async () => {
+      // given
+      const memoryFileRepository = new MemoryFileRepository({
+        strategy: UploadStrategy.MEMORY,
+        options: {
+          endPoint: new URL('https://example.com/path1/path2'),
+        },
+      });
+      // when
+      const url = await memoryFileRepository.getSignedUrlForRead(
+        '/path2/test.txt',
+      );
+
+      // then
+      expect(url).toBe('https://example.com/path1/path2/path2/test.txt');
+    });
+
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const memoryFileRepository = new MemoryFileRepository({
+        strategy: UploadStrategy.MEMORY,
+      });
+
+      // when, then
+      await expect(() =>
+        memoryFileRepository.getSignedUrlForRead('test.txt'),
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getSignedUrlForUpload', () => {
+    it('return url for getting file', async () => {
+      // given
+      const memoryFileRepository = new MemoryFileRepository({
+        strategy: UploadStrategy.MEMORY,
+        options: {
+          endPoint: new URL('https://example.com/path1/path2'),
+        },
+      });
+      // when
+      const url = await memoryFileRepository.getSignedUrlForUpload(
+        '/path2/test.txt',
+      );
+
+      // then
+      expect(url).toBe('https://example.com/path1/path2/path2/test.txt');
+    });
+
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const memoryFileRepository = new MemoryFileRepository({
+        strategy: UploadStrategy.MEMORY,
+      });
+
+      // when, then
+      await expect(() =>
+        memoryFileRepository.getSignedUrlForUpload('test.txt'),
+      ).rejects.toThrow(Error);
+    });
+  });
 });
