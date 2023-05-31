@@ -490,4 +490,136 @@ describe('S3FileRepository', () => {
       ).toBe(true);
     });
   });
+
+  describe('getSignedUrlForUpload', () => {
+    it('return signedUrl from key', async () => {
+      // given
+      const s3FileRepository = new S3FileRepository(
+        {
+          strategy: UploadStrategy.S3,
+          options: {
+            bucket: 'test-bucket',
+            credentials: {
+              accessKeyId: 'test',
+              secretAccessKey: 'test',
+            },
+            region: 'ap-northeast-2',
+          },
+        },
+        new DefaultS3UploadOptionFactory(),
+      );
+      // when
+      const result = await s3FileRepository.getSignedUrlForUpload('test.txt');
+
+      // then
+      expect(result).not.toBe(
+        'https://test-bucket.s3.ap-northeast-2.amazonaws.com/test.txt',
+      );
+      expect(
+        result.startsWith(
+          'https://test-bucket.s3.ap-northeast-2.amazonaws.com/test.txt',
+        ),
+      ).toBe(true);
+    });
+
+    it('return signedUrl from key with forcePathStyle', async () => {
+      // given
+      const s3FileRepository = new S3FileRepository(
+        {
+          strategy: UploadStrategy.S3,
+          options: {
+            bucket: 'test-bucket',
+            credentials: {
+              accessKeyId: 'test',
+              secretAccessKey: 'test',
+            },
+            region: 'ap-northeast-2',
+            forcePathStyle: true,
+          },
+        },
+        new DefaultS3UploadOptionFactory(),
+      );
+      // when
+      const result = await s3FileRepository.getSignedUrlForUpload('test.txt');
+
+      // then
+      expect(result).not.toBe(
+        'https://s3.ap-northeast-2.amazonaws.com/test-bucket/test.txt',
+      );
+      expect(
+        result.startsWith(
+          'https://s3.ap-northeast-2.amazonaws.com/test-bucket/test.txt',
+        ),
+      ).toBe(true);
+    });
+
+    it('return signedUrl for key with endPoint', async () => {
+      // given
+      const s3FileRepository = new S3FileRepository(
+        {
+          strategy: UploadStrategy.S3,
+          options: {
+            bucket: 'test-bucket',
+            credentials: {
+              accessKeyId: 'test',
+              secretAccessKey: 'test',
+            },
+            region: 'ap-northeast-2',
+            endPoint: new URL('http://localhost:4566/test/test'),
+          },
+        },
+        new DefaultS3UploadOptionFactory(),
+      );
+
+      // when
+      const result = await s3FileRepository.getSignedUrlForUpload(
+        'path1/test.txt',
+      );
+
+      // then
+      expect(result).not.toBe(
+        'http://test-bucket.localhost:4566/test/test/path1/test.txt',
+      );
+      expect(
+        result.startsWith(
+          'http://test-bucket.localhost:4566/test/test/path1/test.txt',
+        ),
+      ).toBe(true);
+    });
+
+    it('return url for getting file with forcePathStyle and endPoint', async () => {
+      // given
+      const s3FileRepository = new S3FileRepository(
+        {
+          strategy: UploadStrategy.S3,
+          options: {
+            bucket: 'test-bucket',
+            credentials: {
+              accessKeyId: 'test',
+              secretAccessKey: 'test',
+            },
+            region: 'ap-northeast-2',
+            forcePathStyle: true,
+            endPoint: new URL('http://localhost:4566/test/test'),
+          },
+        },
+        new DefaultS3UploadOptionFactory(),
+      );
+
+      // when
+      const result = await s3FileRepository.getSignedUrlForUpload(
+        'path1/test.txt',
+      );
+
+      // then
+      expect(result).not.toBe(
+        'http://localhost:4566/test/test/test-bucket/path1/test.txt',
+      );
+      expect(
+        result.startsWith(
+          'http://localhost:4566/test/test/test-bucket/path1/test.txt',
+        ),
+      ).toBe(true);
+    });
+  });
 });

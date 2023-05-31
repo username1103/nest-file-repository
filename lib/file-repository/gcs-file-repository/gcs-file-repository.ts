@@ -39,7 +39,7 @@ export class GCSFileRepository implements FileRepository {
   }
 
   async save(file: File): Promise<string> {
-    const filePath = path.join(this.config.options?.path ?? '', file.filename);
+    const filePath = path.join(this.config.options.path ?? '', file.filename);
 
     const options = this.uploadOptionFactory.getOptions(
       new File(filePath, file.data, file.mimetype),

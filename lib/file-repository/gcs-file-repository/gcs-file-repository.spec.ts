@@ -147,6 +147,25 @@ describe('GCSFileRepository', () => {
       // then
       expect(result).toBe(null);
     });
+
+    it('throw NoSuchBucketException if bucket does not exist', async () => {
+      // given
+      const gcsFileRepository = new GCSFileRepository(
+        {
+          strategy: UploadStrategy.GCS,
+          options: {
+            bucket: 'invalid',
+            apiEndPoint: new URL('http://localhost:8080'),
+          },
+        },
+        new DefaultGCSUploadOptionFactory(),
+      );
+
+      // when, then
+      await expect(() =>
+        gcsFileRepository.get('test-file2.txt'),
+      ).rejects.toThrow(NoSuchBucketException);
+    });
   });
 
   describe('getUrl', () => {
