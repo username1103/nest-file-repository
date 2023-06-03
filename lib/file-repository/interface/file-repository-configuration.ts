@@ -23,7 +23,6 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
     };
     bucket: string;
     acl?: S3Acl;
-    endPoint?: URL;
     forcePathStyle?: boolean;
     uploadOptionFactory?: CustomProvider<S3UploadOptionFactory>;
     signedUrlExpires?: number;
@@ -36,7 +35,6 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
   options: CommonOptions & {
     bucket: string;
     keyFile?: string;
-    apiEndPoint?: URL;
     projectId?: string;
     acl?: GCSAcl;
     uploadOptionFactory?: CustomProvider<GCSUploadOptionFactory>;
@@ -47,17 +45,13 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
 export interface DiskFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.DISK;
 
-  options?: CommonOptions & {
-    endPoint?: URL;
-  };
+  options?: CommonOptions;
 }
 
 export interface MemoryFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.MEMORY;
 
-  options?: CommonOptions & {
-    endPoint?: URL;
-  };
+  options?: CommonOptions;
 }
 
 export interface CommonOptions {
@@ -68,6 +62,8 @@ export interface CommonOptions {
    * 0 disables the timeout.
    */
   timeout?: number;
+
+  endPoint?: URL;
 }
 
 export interface CommonConfiguration {

@@ -32,7 +32,7 @@ export class GCSFileRepository implements FileRepository {
   ) {
     this.client = new Storage({
       keyFilename: this.config.options.keyFile,
-      apiEndpoint: config.options.apiEndPoint?.href,
+      apiEndpoint: config.options.endPoint?.href,
       projectId: config.options.projectId,
       timeout: config.options.timeout,
     });
@@ -152,12 +152,12 @@ export class GCSFileRepository implements FileRepository {
   }
 
   async getUrl(key: string): Promise<string> {
-    if (this.config.options.apiEndPoint) {
+    if (this.config.options.endPoint) {
       return new URL(
         normalizePath(
-          `${this.config.options.apiEndPoint.pathname}/${this.config.options.bucket}/${key}`,
+          `${this.config.options.endPoint.pathname}/${this.config.options.bucket}/${key}`,
         ),
-        this.config.options.apiEndPoint,
+        this.config.options.endPoint,
       ).href;
     }
     return new URL(

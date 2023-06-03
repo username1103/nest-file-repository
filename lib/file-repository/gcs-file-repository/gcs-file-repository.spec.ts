@@ -13,7 +13,7 @@ describe('GCSFileRepository', () => {
       const config: GCSFileRepositoryConfiguration = {
         strategy: UploadStrategy.GCS,
         options: {
-          apiEndPoint: new URL('http://localhost:8080'),
+          endPoint: new URL('http://localhost:8080'),
           projectId: 'test',
           bucket: 'test-bucket',
           path: '/test',
@@ -38,7 +38,7 @@ describe('GCSFileRepository', () => {
       const config: GCSFileRepositoryConfiguration = {
         strategy: UploadStrategy.GCS,
         options: {
-          apiEndPoint: new URL('http://localhost:8080'),
+          endPoint: new URL('http://localhost:8080'),
           projectId: 'test',
           bucket: 'test-bucket',
         },
@@ -62,7 +62,7 @@ describe('GCSFileRepository', () => {
       const config: GCSFileRepositoryConfiguration = {
         strategy: UploadStrategy.GCS,
         options: {
-          apiEndPoint: new URL('http://localhost:8080'),
+          endPoint: new URL('http://localhost:8080'),
           projectId: 'test',
           bucket: 'test-bucket',
           timeout: 1,
@@ -86,7 +86,7 @@ describe('GCSFileRepository', () => {
       const config: GCSFileRepositoryConfiguration = {
         strategy: UploadStrategy.GCS,
         options: {
-          apiEndPoint: new URL('http://localhost:8080'),
+          endPoint: new URL('http://localhost:8080'),
           projectId: 'test',
           bucket: 'test-bucket2',
         },
@@ -113,7 +113,7 @@ describe('GCSFileRepository', () => {
           strategy: UploadStrategy.GCS,
           options: {
             bucket: 'test-bucket',
-            apiEndPoint: new URL('http://localhost:8080'),
+            endPoint: new URL('http://localhost:8080'),
           },
         },
         new DefaultGCSUploadOptionFactory(),
@@ -135,7 +135,7 @@ describe('GCSFileRepository', () => {
           strategy: UploadStrategy.GCS,
           options: {
             bucket: 'test-bucket',
-            apiEndPoint: new URL('http://localhost:8080'),
+            endPoint: new URL('http://localhost:8080'),
           },
         },
         new DefaultGCSUploadOptionFactory(),
@@ -155,7 +155,7 @@ describe('GCSFileRepository', () => {
           strategy: UploadStrategy.GCS,
           options: {
             bucket: 'invalid',
-            apiEndPoint: new URL('http://localhost:8080'),
+            endPoint: new URL('http://localhost:8080'),
           },
         },
         new DefaultGCSUploadOptionFactory(),
@@ -197,7 +197,7 @@ describe('GCSFileRepository', () => {
           strategy: UploadStrategy.GCS,
           options: {
             bucket: 'test-bucket',
-            apiEndPoint: new URL('http://localhost:8080/path'),
+            endPoint: new URL('http://localhost:8080/path'),
           },
         },
         new DefaultGCSUploadOptionFactory(),
