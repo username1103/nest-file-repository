@@ -14,11 +14,11 @@ export class DefaultS3UploadOptionFactory implements S3UploadOptionFactory {
     config: S3FileRepositoryConfiguration,
   ): S3UploadOption {
     return {
-      Bucket: config.options.bucket,
-      Key: file.filename,
-      Body: file.data,
-      ACL: config.options.acl,
-      ContentType: file.mimetype,
+      bucket: config.options.bucket,
+      key: file.filename,
+      body: file.data,
+      acl: config.options.acl,
+      contentType: file.mimetype,
     };
   }
 }

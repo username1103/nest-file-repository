@@ -3,76 +3,228 @@ import * as fs from 'fs/promises';
 import { DiskFileRepository } from './disk-file-repository';
 import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
+import { expectNonNullable } from '../../test/expect/expect-non-nullable';
 import { TimeoutException } from '../exception';
 
-describe('DiskFileService', () => {
-  it('save file in disk', async () => {
-    // given
-    const file = new File('test.txt', Buffer.from('hello'));
-    const diskFileStore = new DiskFileRepository({
-      strategy: UploadStrategy.DISK,
-      options: { path: './sample/sample-nested' },
+describe('DiskFileRepository', () => {
+  describe('save', () => {
+    it('save file in disk', async () => {
+      // given
+      const file = new File('test.txt', Buffer.from('hello'));
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: { path: './sample/sample-nested' },
+      });
+
+      // when
+      const result = await diskFileRepository.save(file);
+
+      // then
+      expect(result).toBe('sample/sample-nested/test.txt');
+      const buffer = await fs.readFile(result);
+      expect(buffer.toString()).toBe('hello');
+
+      await fs.unlink(result);
     });
 
-    // when
-    const result = await diskFileStore.save(file);
+    it('save file in disk when no path in options of config', async () => {
+      // given
+      const file = new File('test.txt', Buffer.from('hello'));
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
 
-    // then
-    expect(result).toBe('sample/sample-nested/test.txt');
-    const buffer = await fs.readFile(result);
-    expect(buffer.toString()).toBe('hello');
+      // when
+      const result = await diskFileRepository.save(file);
 
-    await fs.unlink(result);
+      // then
+      expect(result).toBe('test.txt');
+      const buffer = await fs.readFile(result);
+      expect(buffer.toString()).toBe('hello');
+
+      await fs.unlink(result);
+    });
+
+    it('save file in disk if config doesnt have path', async () => {
+      // given
+      const file = new File('test.txt', Buffer.from('hello'));
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when
+      const result = await diskFileRepository.save(file);
+
+      // then
+      expect(result).toBe('test.txt');
+      const buffer = await fs.readFile(result);
+      expect(buffer.toString()).toBe('hello');
+
+      await fs.unlink(result);
+    });
+
+    it('throw TimeoutException if times out', async () => {
+      // given
+      const data = await fs.readFile('./sample.jpeg');
+      const file = new File('test.jpg', data);
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: { path: '.', timeout: 1 },
+      });
+
+      // when, then
+      await expect(() => diskFileRepository.save(file)).rejects.toThrow(
+        new TimeoutException('raise timeout: 1ms'),
+      );
+    });
   });
 
-  it('save file in disk when no path in options of config', async () => {
-    // given
-    const file = new File('test.txt', Buffer.from('hello'));
-    const diskFileStore = new DiskFileRepository({
-      strategy: UploadStrategy.DISK,
+  describe('get', () => {
+    it('return the file that exists in the path', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when
+      const file = await diskFileRepository.get('sample.jpeg');
+
+      // then
+      expectNonNullable(file);
+      expect(file.filename).toBe('sample.jpeg');
+      expect(file.data).toBeDefined();
     });
 
-    // when
-    const result = await diskFileStore.save(file);
+    it('return null if target is directory', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
 
-    // then
-    expect(result).toBe('test.txt');
-    const buffer = await fs.readFile(result);
-    expect(buffer.toString()).toBe('hello');
+      // when
+      const file = await diskFileRepository.get('scripts');
 
-    await fs.unlink(result);
+      // then
+      expect(file).toBeNull();
+    });
+
+    it('return null if file does not exist', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when
+      const file = await diskFileRepository.get('invalid.jpeg');
+
+      // then
+      expect(file).toBeNull();
+    });
+
+    it('throw TimeoutException if times out', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: {
+          timeout: 1,
+        },
+      });
+
+      // when, then
+      await expect(() => diskFileRepository.get('sample.jpeg')).rejects.toThrow(
+        new TimeoutException('raise timeout: 1ms'),
+      );
+    });
   });
 
-  it('save file in disk if config doesnt have path', async () => {
-    // given
-    const file = new File('test.txt', Buffer.from('hello'));
-    const diskFileStore = new DiskFileRepository({
-      strategy: UploadStrategy.DISK,
+  describe('getUrl', () => {
+    it('return url for getting file', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: {
+          endPoint: new URL('https://example.com/path1'),
+        },
+      });
+      // when
+      const url = await diskFileRepository.getUrl('/path/path/test.txt');
+
+      // then
+      expect(url).toBe('https://example.com/path1/path/path/test.txt');
     });
 
-    // when
-    const result = await diskFileStore.save(file);
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
 
-    // then
-    expect(result).toBe('test.txt');
-    const buffer = await fs.readFile(result);
-    expect(buffer.toString()).toBe('hello');
-
-    await fs.unlink(result);
+      // when, then
+      await expect(() => diskFileRepository.getUrl('test.txt')).rejects.toThrow(
+        Error,
+      );
+    });
   });
 
-  it('throw timeout error if times out', async () => {
-    // given
-    const data = await fs.readFile('./sample.jpeg');
-    const file = new File('test.jpg', data);
-    const diskFileStore = new DiskFileRepository({
-      strategy: UploadStrategy.DISK,
-      options: { path: '.', timeout: 1 },
+  describe('getSignedUrlForRead', () => {
+    it('return url for getting file', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: {
+          endPoint: new URL('https://example.com/path1'),
+        },
+      });
+      // when
+      const url = await diskFileRepository.getSignedUrlForRead(
+        '/path/path/test.txt',
+      );
+
+      // then
+      expect(url).toBe('https://example.com/path1/path/path/test.txt');
     });
 
-    // when, then
-    await expect(() => diskFileStore.save(file)).rejects.toThrow(
-      new TimeoutException('raise timeout: 1ms'),
-    );
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when, then
+      await expect(() =>
+        diskFileRepository.getSignedUrlForRead('test.txt'),
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getSignedUrlForUpload', () => {
+    it('return url for getting file', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: {
+          endPoint: new URL('https://example.com/path1'),
+        },
+      });
+      // when
+      const url = await diskFileRepository.getSignedUrlForUpload(
+        '/path/path/test.txt',
+      );
+
+      // then
+      expect(url).toBe('https://example.com/path1/path/path/test.txt');
+    });
+
+    it('throw Error if url option does not exists', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+      });
+
+      // when, then
+      await expect(() =>
+        diskFileRepository.getSignedUrlForUpload('test.txt'),
+      ).rejects.toThrow(Error);
+    });
   });
 });

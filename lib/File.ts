@@ -1,15 +1,13 @@
 import path from 'path';
 
-import { Mimetype } from './constant';
-
 export class File {
   filename: string;
 
   data: Buffer;
 
-  mimetype?: Mimetype;
+  mimetype?: string;
 
-  constructor(filename: string, data: Buffer, mimetype?: Mimetype) {
+  constructor(filename: string, data: Buffer, mimetype?: string) {
     this.filename = filename;
     this.data = data;
     this.mimetype = mimetype;

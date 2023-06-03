@@ -94,9 +94,9 @@ describe('FileRepositoryModule', () => {
         config: S3FileRepositoryConfiguration,
       ): S3UploadOption {
         return {
-          Bucket: config.options.bucket,
-          Key: file.filename,
-          Body: file.data,
+          bucket: config.options.bucket,
+          key: file.filename,
+          body: file.data,
         };
       }
     }
@@ -139,9 +139,9 @@ describe('FileRepositoryModule', () => {
         config: S3FileRepositoryConfiguration,
       ): S3UploadOption {
         return {
-          Bucket: config.options.bucket,
-          Key: file.filename,
-          Body: file.data,
+          bucket: config.options.bucket,
+          key: file.filename,
+          body: file.data,
         };
       }
     }
@@ -184,9 +184,9 @@ describe('FileRepositoryModule', () => {
         config: S3FileRepositoryConfiguration,
       ): S3UploadOption {
         return {
-          Bucket: config.options.bucket,
-          Key: file.filename,
-          Body: file.data,
+          bucket: config.options.bucket,
+          key: file.filename,
+          body: file.data,
         };
       }
     }
@@ -240,9 +240,9 @@ describe('FileRepositoryModule', () => {
         config: S3FileRepositoryConfiguration,
       ): S3UploadOption {
         return {
-          Bucket: config.options.bucket,
-          Key: this.nameGenerator.generate(file),
-          Body: file.data,
+          bucket: config.options.bucket,
+          key: this.nameGenerator.generate(file),
+          body: file.data,
         };
       }
     }
@@ -322,11 +322,12 @@ describe('FileRepositoryModule', () => {
         config: GCSFileRepositoryConfiguration,
       ): GCSUploadOption {
         return {
-          Bucket: config.options.bucket,
+          bucket: config.options.bucket,
           fileName: file.filename,
           fileData: file.data,
-          ContentType: file.mimetype,
+          contentType: file.mimetype,
           resumable: false,
+          acl: 'private',
         };
       }
     }

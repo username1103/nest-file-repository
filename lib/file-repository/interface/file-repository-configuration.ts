@@ -2,7 +2,7 @@ import { GCSUploadOptionFactory } from './gcs-upload-option-factory';
 import { S3UploadOptionFactory } from './s3-upload-option-factory';
 import { UploadStrategy } from '../../enum';
 import { CustomProvider } from '../../interface/custom-provider';
-import { Acl } from '../constant';
+import { GCSAcl, S3Acl } from '../constant';
 
 export const CONFIG = Symbol('CONFIG');
 
@@ -22,10 +22,10 @@ export interface S3FileRepositoryConfiguration extends CommonConfiguration {
       accessKeyId: string;
     };
     bucket: string;
-    acl?: Acl;
-    endPoint?: string;
+    acl?: S3Acl;
     forcePathStyle?: boolean;
     uploadOptionFactory?: CustomProvider<S3UploadOptionFactory>;
+    signedUrlExpires?: number;
   };
 }
 
@@ -35,9 +35,10 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
   options: CommonOptions & {
     bucket: string;
     keyFile?: string;
-    apiEndPoint?: string;
     projectId?: string;
+    acl?: GCSAcl;
     uploadOptionFactory?: CustomProvider<GCSUploadOptionFactory>;
+    signedUrlExpires?: number;
   };
 }
 
@@ -61,6 +62,8 @@ export interface CommonOptions {
    * 0 disables the timeout.
    */
   timeout?: number;
+
+  endPoint?: URL;
 }
 
 export interface CommonConfiguration {

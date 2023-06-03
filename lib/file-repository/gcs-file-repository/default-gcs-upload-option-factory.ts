@@ -16,9 +16,10 @@ export class DefaultGCSUploadOptionFactory implements GCSUploadOptionFactory {
     return {
       fileName: file.filename,
       fileData: file.data,
-      Bucket: config.options.bucket,
-      ContentType: file.mimetype,
+      bucket: config.options.bucket,
       resumable: false,
+      contentType: file.mimetype,
+      acl: config.options.acl,
     };
   }
 }

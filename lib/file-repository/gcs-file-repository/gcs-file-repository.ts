@@ -5,7 +5,12 @@ import { ApiError } from '@google-cloud/storage/build/src/nodejs-common';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
-import { NoSuchBucketException, TimeoutException } from '../exception';
+import { normalizePath } from '../../util/shared.util';
+import {
+  InvalidAccessKeyException,
+  NoSuchBucketException,
+  TimeoutException,
+} from '../exception';
 import { FileRepository } from '../file-repository';
 import {
   CONFIG,
@@ -27,14 +32,14 @@ export class GCSFileRepository implements FileRepository {
   ) {
     this.client = new Storage({
       keyFilename: this.config.options.keyFile,
-      apiEndpoint: config.options.apiEndPoint,
+      apiEndpoint: config.options.endPoint?.href,
       projectId: config.options.projectId,
       timeout: config.options.timeout,
     });
   }
 
   async save(file: File): Promise<string> {
-    const filePath = path.join(this.config.options?.path ?? '', file.filename);
+    const filePath = path.join(this.config.options.path ?? '', file.filename);
 
     const options = this.uploadOptionFactory.getOptions(
       new File(filePath, file.data, file.mimetype),
@@ -42,15 +47,23 @@ export class GCSFileRepository implements FileRepository {
     );
     try {
       await this.client
-        .bucket(options.Bucket)
+        .bucket(options.bucket)
         .file(options.fileName)
         .save(options.fileData, {
           timeout: this.config.options.timeout,
           resumable: options.resumable,
+          contentType: options.contentType,
+          predefinedAcl: options.acl,
         });
     } catch (e) {
       if (!(e instanceof Error)) {
         throw e;
+      }
+
+      if ((e as any).code === 'ERR_OSSL_UNSUPPORTED') {
+        throw new InvalidAccessKeyException(
+          `invalid access key: ${this.config.options.keyFile}`,
+        );
       }
 
       if (e.name === 'FetchError' && (e as any).type === 'request-timeout') {
@@ -59,7 +72,21 @@ export class GCSFileRepository implements FileRepository {
         );
       }
 
-      if (e instanceof ApiError && e.code === 404) {
+      if (
+        e instanceof ApiError &&
+        e.code === 404 &&
+        e.message.includes('The specified bucket does not exist')
+      ) {
+        throw new NoSuchBucketException(
+          `not exists bucket: ${this.config.options.bucket}`,
+        );
+      }
+
+      if (
+        e instanceof ApiError &&
+        e.code === 404 &&
+        !(await this.client.bucket(options.bucket).exists())[0]
+      ) {
         throw new NoSuchBucketException(
           `not exists bucket: ${this.config.options.bucket}`,
         );
@@ -69,5 +96,103 @@ export class GCSFileRepository implements FileRepository {
     }
 
     return filePath;
+  }
+
+  async get(key: string): Promise<File | null> {
+    try {
+      const [result] = await this.client
+        .bucket(this.config.options.bucket)
+        .file(key)
+        .download();
+
+      return new File(key, result);
+    } catch (e) {
+      if ((e as any).code === 'ERR_OSSL_UNSUPPORTED') {
+        throw new InvalidAccessKeyException(
+          `invalid access key: ${this.config.options.keyFile}`,
+        );
+      }
+
+      if (
+        e instanceof ApiError &&
+        e.code === 404 &&
+        e.message.includes('No such object')
+      ) {
+        return null;
+      }
+
+      if (
+        e instanceof ApiError &&
+        e.code === 404 &&
+        e.message.includes('The specified bucket does not exist')
+      ) {
+        throw new NoSuchBucketException(
+          `not exists bucket: ${this.config.options.bucket}`,
+        );
+      }
+
+      /**
+       * for fake-gcs-server error handling
+       * https://github.com/fsouza/fake-gcs-server/issues/1187
+       */
+      if (e instanceof ApiError && e.code === 404) {
+        if (
+          (await this.client.bucket(this.config.options.bucket).exists())[0]
+        ) {
+          return null;
+        }
+
+        throw new NoSuchBucketException(
+          `not exists bucket: ${this.config.options.bucket}`,
+        );
+      }
+
+      throw e;
+    }
+  }
+
+  async getUrl(key: string): Promise<string> {
+    if (this.config.options.endPoint) {
+      return new URL(
+        normalizePath(
+          `${this.config.options.endPoint.pathname}/${this.config.options.bucket}/${key}`,
+        ),
+        this.config.options.endPoint,
+      ).href;
+    }
+    return new URL(
+      normalizePath(`/${this.config.options.bucket}/${key}`),
+      this.getDefaultEndPoint(),
+    ).href;
+  }
+
+  async getSignedUrlForRead(key: string): Promise<string> {
+    const [signedUrl] = await this.client
+      .bucket(this.config.options.bucket)
+      .file(key)
+      .getSignedUrl({
+        action: 'read',
+        expires:
+          Date.now() + (this.config.options.signedUrlExpires ?? 3600) * 1000,
+      });
+
+    return signedUrl;
+  }
+
+  async getSignedUrlForUpload(key: string): Promise<string> {
+    const [signedUrl] = await this.client
+      .bucket(this.config.options.bucket)
+      .file(key)
+      .getSignedUrl({
+        action: 'write',
+        expires:
+          Date.now() + (this.config.options.signedUrlExpires ?? 3600) * 1000,
+      });
+
+    return signedUrl;
+  }
+
+  private getDefaultEndPoint(): string {
+    return `https://storage.googleapis.com`;
   }
 }

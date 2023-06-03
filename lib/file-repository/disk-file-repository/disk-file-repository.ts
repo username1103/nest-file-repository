@@ -6,6 +6,7 @@ import * as path from 'path';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
+import { normalizePath } from '../../util/shared.util';
 import { TimeoutException } from '../exception';
 import { FileRepository } from '../file-repository';
 import {
@@ -50,5 +51,68 @@ export class DiskFileRepository implements FileRepository {
     }
 
     return filePath;
+  }
+
+  async get(key: string): Promise<File | null> {
+    try {
+      const fileStat = await fs.stat(key);
+
+      if (!fileStat.isFile()) {
+        return null;
+      }
+
+      const options: ObjectEncodingOptions & {
+        mode?: Mode;
+        flag?: OpenMode;
+      } & Abortable = {
+        flag: 'r',
+      };
+
+      if (this.config.options?.timeout) {
+        options.signal = AbortSignal.timeout(this.config.options.timeout);
+      }
+
+      const fileContents = await fs.readFile(key, options);
+
+      return new File(
+        key,
+        typeof fileContents === 'string'
+          ? Buffer.from(fileContents)
+          : fileContents,
+      );
+    } catch (e) {
+      if ((e as any)?.code === 'ENOENT') {
+        return null;
+      }
+
+      if ((e as any).name === 'AbortError') {
+        throw new TimeoutException(
+          `raise timeout: ${this.config.options?.timeout}ms`,
+        );
+      }
+
+      throw e;
+    }
+  }
+
+  async getUrl(key: string): Promise<string> {
+    if (!this.config.options?.endPoint) {
+      throw new Error(
+        'You need to set the url option in configuration for "getUrl"',
+      );
+    }
+
+    return new URL(
+      normalizePath(`${this.config.options.endPoint.pathname}/${key}`),
+      this.config.options.endPoint,
+    ).href;
+  }
+
+  async getSignedUrlForRead(key: string): Promise<string> {
+    return this.getUrl(key);
+  }
+
+  async getSignedUrlForUpload(key: string): Promise<string> {
+    return await this.getSignedUrlForRead(key);
   }
 }
