@@ -13,6 +13,7 @@ This library provides a flexible file repository for storing files.
 
 - Provides a flexible file repository
 - Support Disk, Memory, AWS S3, GCS(google cloud storage) file repository
+- Use `save` for save file, `get` for get file, `getUrl` for download public file, `getSingedUrlForRead` for download private file, `getSignedUrlForUpload` for download private file method
 
 ## Installation
 
@@ -23,13 +24,13 @@ npm install nest-file-repository
 yarn add nest-file-repository
 ```
 
-If you want to use `S3FileRepository`, you have to install `@aws-sdk/client-s3`.
+If you want to use `S3FileRepository`, you have to install `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`.
 ```bash
-npm install nest-file-repository @aws-sdk/client-s3
+npm install nest-file-repository @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
 ```bash
-yarn add nest-file-repository @aws-sdk/client-s3
+yarn add nest-file-repository @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
 If you want to use `GCSFileRepository`, you have to install `@google-cloud/storage`
@@ -41,7 +42,7 @@ npm install nest-file-repository @google-cloud/storage
 yarn add nest-file-repository @google-cloud/storage
 ```
 
-## Usage
+## Basic Usage
 
 First, the module we created must be imported into your module
 ```typescript
@@ -52,16 +53,7 @@ import { YourService } from './your.service'
 @Module({
   imports: [
     FileRepositoryModule.register({
-      strategy: UploadStrategy.S3,
-      options: {
-        region: 'your region',
-        bucket: 'your bucket',
-        acl: 'public-read', // acl of your bucket
-        credentials: {
-          accessKeyId: 'your access key id',
-          secretAccessKey: 'your secret access key',
-        },
-      },
+      strategy: UploadStrategy.MEMORY,
     }),
   ],
   providers: [YourService]
@@ -72,19 +64,41 @@ export class YourModule {}
 Then, Make the file repository available to inject into your service what you want.  
 Appropriate file repository will be injected via the config you passed when configuring the module.
 
-
 ```typescript
 import { Injectable } from '@nestjs/common';
 import { FileRepository, File } from 'nest-file-repository';
+import { getBindingIdentifiers } from "@babel/types";
 
 @Injectable()
 export class YourService {
-  constructor(private readonly fileRepository: FileRepository) {}
-  
+  constructor(private readonly fileRepository: FileRepository) {
+  }
+
   async save(filePath: string, fileData: Buffer): Promise<string> {
     const path = await this.fileRepository.save(new File(filePath, fileData))
-    
+
     return path;
+  }
+
+  async get(key: string): Promise<File> {
+    const file = await this.fileRepository.get(key);
+    if (!file) {
+      throw new Error("file not found");
+    }
+    
+    return file;
+  }
+
+  async getUrl(key: string): Promise<string> {
+    return this.fileRepository.getUrl(key);
+  }
+  
+  async getSignedUrlForRead(key: string): Promise<string> {
+    return this.fileRepository.getSingedUrlForRead(key)
+  }
+
+  async getSignedUrlForUpload(key: string): Promise<string> {
+    return this.fileRepository.getSingedUrlForUpload(key)
   }
 }
 ```
@@ -103,16 +117,7 @@ import { FileRepositoryModule, UploadStrategy } from 'nest-file-repository';
   imports: [
     FileRepositoryModule.register({
       name: 'sample1',
-      strategy: UploadStrategy.S3,
-      options: {
-        region: 'your region',
-        bucket: 'your bucket',
-        acl: 'public-read', // acl of your bucket
-        credentials: {
-          accessKeyId: 'your access key id',
-          secretAccessKey: 'your secret access key',
-        },
-      },
+      strategy: UploadStrategy.MEMORY,
     }),
     FileRepositoryModule.register({
       name: 'sample2',
@@ -156,6 +161,8 @@ export class YourService {
 }
 ```
 
+## Customize
+
 ### CustomProvider
 
 You can customize some providers. For example, `options.uploadOptionFactory` in `S3FileRepositoryConfiguration` is type `CustomProvider<S3UploadOptionFactory>`.  
@@ -176,9 +183,9 @@ class CustomS3UploadOptionFactory implements S3UploadOptionFactory {
     config: S3FileRepositoryConfiguration,
   ): S3UploadOption {
     return {
-      Bucket: config.options.bucket,
-      Key: file.filename,
-      Body: file.data,
+      bucket: config.options.bucket,
+      key: file.filename,
+      body: file.data,
     };
   }
 }
@@ -285,9 +292,9 @@ class CustomS3UploadOptionFactory implements S3UploadOptionFactory {
     config: S3FileRepositoryConfiguration,
   ): S3UploadOption {
     return {
-      Bucket: config.options.bucket,
-      Key: this.nameGenerator.generate(file),
-      Body: file.data,
+      bucket: config.options.bucket,
+      key: this.nameGenerator.generate(file),
+      body: file.data,
     };
   }
 }
