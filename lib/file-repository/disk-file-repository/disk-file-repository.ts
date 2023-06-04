@@ -1,14 +1,13 @@
 import { Abortable } from 'events';
 import * as fs from 'fs/promises';
 import { Mode, ObjectEncodingOptions, OpenMode } from 'node:fs';
-import * as path from 'path';
 
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 
+import { FilePathResolver } from './file-path-resolver';
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
 import { TimeoutException } from '../exception';
-import { InvalidPathException } from '../exception/invalid-path.exception';
 import { FileRepository } from '../file-repository';
 import {
   CONFIG,
@@ -19,10 +18,12 @@ import {
 export class DiskFileRepository implements FileRepository, OnModuleInit {
   constructor(
     @Inject(CONFIG) private readonly config: DiskFileRepositoryConfiguration,
+    private readonly filePathResolver: FilePathResolver,
   ) {}
 
   async save(file: File): Promise<string> {
-    const filePath = this.getFilePath(file.filename);
+    const filePath = this.filePathResolver.getPathByFile(file);
+    const key = this.filePathResolver.getKeyByFile(file);
 
     const options: ObjectEncodingOptions & {
       mode?: Mode;
@@ -37,7 +38,9 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
 
     try {
       if (this.config.options.path) {
-        await fs.mkdir(this.getDirectoryPath(), { recursive: true });
+        await fs.mkdir(this.filePathResolver.getDirectoryPath(), {
+          recursive: true,
+        });
       }
 
       await fs.writeFile(filePath, file.data, options);
@@ -51,12 +54,12 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
       throw e;
     }
 
-    return filePath;
+    return key;
   }
 
   async get(key: string): Promise<File | null> {
     try {
-      const filePath = this.getFilePath(key);
+      const filePath = this.filePathResolver.getPathByKey(key);
       const fileStat = await fs.stat(filePath);
 
       if (!fileStat.isFile()) {
@@ -120,23 +123,5 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
 
   async onModuleInit() {
     await fs.mkdir(this.config.options.bucket);
-  }
-
-  private getBucketPath(): string {
-    return path.join(this.config.options.bucket);
-  }
-
-  private getDirectoryPath(): string {
-    return path.join(this.getBucketPath(), this.config.options.path ?? '');
-  }
-
-  private getFilePath(key: string): string {
-    const filePath = path.join(this.getDirectoryPath(), key);
-
-    if (path.relative(this.config.options.bucket, filePath).includes('../')) {
-      throw new InvalidPathException('Can not access files outside of bucket');
-    }
-
-    return filePath;
   }
 }

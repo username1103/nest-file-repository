@@ -21,11 +21,11 @@ describe('DiskFileRepository', () => {
       const result = await diskFileRepository.save(file);
 
       // then
-      expect(result).toBe('test-bucket/sample/sample-nested/test.txt');
-      const buffer = await fs.readFile(result);
+      expect(result).toBe('sample/sample-nested/test.txt');
+      const buffer = await fs.readFile(`test-bucket/${result}`);
       expect(buffer.toString()).toBe('hello');
 
-      await fs.unlink(result);
+      await fs.unlink(`test-bucket/${result}`);
     });
 
     it('save file in disk when no path in options of config', async () => {
@@ -42,11 +42,11 @@ describe('DiskFileRepository', () => {
       const result = await diskFileRepository.save(file);
 
       // then
-      expect(result).toBe('test-bucket/test.txt');
-      const buffer = await fs.readFile(result);
+      expect(result).toBe('test.txt');
+      const buffer = await fs.readFile(`test-bucket/${result}`);
       expect(buffer.toString()).toBe('hello');
 
-      await fs.unlink(result);
+      await fs.unlink(`test-bucket/${result}`);
     });
 
     it('throw TimeoutException if times out', async () => {
