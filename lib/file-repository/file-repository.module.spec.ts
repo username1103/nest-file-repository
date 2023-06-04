@@ -37,7 +37,7 @@ describe('FileRepositoryModule', () => {
     // given
     const diskConfig: DiskFileRepositoryConfiguration = {
       strategy: UploadStrategy.DISK,
-      options: { path: '.' },
+      options: { path: '.', bucket: 'test-bucket' },
     };
     const module = await Test.createTestingModule({
       imports: [FileRepositoryModule.register(diskConfig)],
@@ -359,6 +359,7 @@ describe('FileRepositoryModule', () => {
     // given
     const memoryConfig: MemoryFileRepositoryConfiguration = {
       strategy: UploadStrategy.MEMORY,
+      options: { bucket: 'test-bucket' },
     };
     const module = await Test.createTestingModule({
       imports: [FileRepositoryModule.register(memoryConfig)],
@@ -382,6 +383,7 @@ describe('FileRepositoryModule', () => {
         FileRepositoryModule.register({
           strategy: UploadStrategy.MEMORY,
           name: 'alias',
+          options: { bucket: 'test-bucket' },
         }),
       ],
     }).compile();
@@ -400,6 +402,7 @@ describe('FileRepositoryModule', () => {
         FileRepositoryModule.register({
           strategy: UploadStrategy.MEMORY,
           name: name,
+          options: { bucket: 'test-bucket' },
         }),
       ],
     }).compile();
