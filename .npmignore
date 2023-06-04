@@ -16,3 +16,4 @@ jest.setup.ts
 *.jpg
 tsconfig.json
 sonar-project.properties
+test-bucket

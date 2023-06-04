@@ -1,5 +1,3 @@
-import path from 'path';
-
 import {
   GetObjectCommand,
   PutObjectCommand,
@@ -17,6 +15,7 @@ import {
   NotAllowedAclException,
   TimeoutException,
 } from '../exception';
+import { FilePathResolver } from '../file-path-resolver';
 import { FileRepository } from '../file-repository';
 import {
   CONFIG,
@@ -35,6 +34,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
     @Inject(CONFIG) private readonly config: S3FileRepositoryConfiguration,
     @Inject(S3_UPLOAD_OPTION_FACTORY)
     private readonly s3UploadOptionFactory: S3UploadOptionFactory,
+    private readonly filePathResolver: FilePathResolver,
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
@@ -51,10 +51,10 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
   }
 
   async save(file: File): Promise<string> {
-    const filePath = path.join(this.config.options?.path ?? '', file.filename);
+    const key = this.filePathResolver.getKeyByFile(file);
 
     const options = this.s3UploadOptionFactory.getOptions(
-      new File(filePath, file.data, file.mimetype),
+      new File(key, file.data, file.mimetype),
       this.config,
     );
 
@@ -111,7 +111,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
       throw e;
     }
 
-    return filePath;
+    return key;
   }
 
   async get(key: string): Promise<File | null> {
@@ -170,15 +170,13 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
       ? new URL(
           this.getPathStyleEndPoint(
             this.config.options.bucket,
-            this.config.options.region,
-            this.config.options.endPoint,
+            this.config.options.endPoint ?? this.getDefaultEndPoint(),
           ),
         )
       : new URL(
           this.getHostStyleEndPoint(
             this.config.options.bucket,
-            this.config.options.region,
-            this.config.options.endPoint,
+            this.config.options.endPoint ?? this.getDefaultEndPoint(),
           ),
         );
 
@@ -202,26 +200,16 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
     return await this.getSignedUrlForRead(key);
   }
 
-  private getPathStyleEndPoint(
-    bucket: string,
-    region: string,
-    endPoint?: URL,
-  ): string {
-    return `${
-      endPoint?.toString() ?? `https://s3.${region}.amazonaws.com`
-    }/${bucket}`;
+  private getPathStyleEndPoint(bucket: string, endPoint: URL): string {
+    return `${endPoint.toString()}/${bucket}`;
   }
 
-  private getHostStyleEndPoint(
-    bucket: string,
-    region: string,
-    endPoint?: URL,
-  ): string {
-    if (endPoint) {
-      return `${endPoint.protocol}//${bucket}.${endPoint.host}${endPoint.pathname}`;
-    }
+  private getHostStyleEndPoint(bucket: string, endPoint: URL): string {
+    return `${endPoint.protocol}//${bucket}.${endPoint.host}${endPoint.pathname}`;
+  }
 
-    return `https://${bucket}.s3.${region}.amazonaws.com`;
+  private getDefaultEndPoint(): URL {
+    return new URL(`https://s3.${this.config.options.region}.amazonaws.com`);
   }
 
   onModuleDestroy() {

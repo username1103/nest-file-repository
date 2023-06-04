@@ -4,6 +4,7 @@ import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
 import { expectNonNullable } from '../../test/expect/expect-non-nullable';
 import { NoSuchBucketException, TimeoutException } from '../exception';
+import { FilePathResolver } from '../file-path-resolver';
 import { GCSFileRepositoryConfiguration } from '../interface/file-repository-configuration';
 
 describe('GCSFileRepository', () => {
@@ -22,6 +23,7 @@ describe('GCSFileRepository', () => {
       const gcsFileRepository = new GCSFileRepository(
         config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       const file = new File('file.txt', Buffer.from('hello'));
@@ -46,6 +48,7 @@ describe('GCSFileRepository', () => {
       const gcsFileRepository = new GCSFileRepository(
         config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       const file = new File('file.txt', Buffer.from('hello'));
@@ -71,6 +74,7 @@ describe('GCSFileRepository', () => {
       const gcsFileRepository = new GCSFileRepository(
         config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       const file = new File('file.txt', Buffer.from('hello'));
@@ -94,6 +98,7 @@ describe('GCSFileRepository', () => {
       const gcsFileRepository = new GCSFileRepository(
         config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       const file = new File('file.txt', Buffer.from('hello'));
@@ -108,15 +113,17 @@ describe('GCSFileRepository', () => {
   describe('get', () => {
     it('return file that exists in the key', async () => {
       // given
-      const gcsFileRepository = new GCSFileRepository(
-        {
-          strategy: UploadStrategy.GCS,
-          options: {
-            bucket: 'test-bucket',
-            endPoint: new URL('http://localhost:8080'),
-          },
+      const config: GCSFileRepositoryConfiguration = {
+        strategy: UploadStrategy.GCS,
+        options: {
+          bucket: 'test-bucket',
+          endPoint: new URL('http://localhost:8080'),
         },
+      };
+      const gcsFileRepository = new GCSFileRepository(
+        config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -130,15 +137,17 @@ describe('GCSFileRepository', () => {
 
     it('return null if file does not exist', async () => {
       // given
-      const gcsFileRepository = new GCSFileRepository(
-        {
-          strategy: UploadStrategy.GCS,
-          options: {
-            bucket: 'test-bucket',
-            endPoint: new URL('http://localhost:8080'),
-          },
+      const config: GCSFileRepositoryConfiguration = {
+        strategy: UploadStrategy.GCS,
+        options: {
+          bucket: 'test-bucket',
+          endPoint: new URL('http://localhost:8080'),
         },
+      };
+      const gcsFileRepository = new GCSFileRepository(
+        config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -150,15 +159,17 @@ describe('GCSFileRepository', () => {
 
     it('throw NoSuchBucketException if bucket does not exist', async () => {
       // given
-      const gcsFileRepository = new GCSFileRepository(
-        {
-          strategy: UploadStrategy.GCS,
-          options: {
-            bucket: 'invalid',
-            endPoint: new URL('http://localhost:8080'),
-          },
+      const config: GCSFileRepositoryConfiguration = {
+        strategy: UploadStrategy.GCS,
+        options: {
+          bucket: 'invalid',
+          endPoint: new URL('http://localhost:8080'),
         },
+      };
+      const gcsFileRepository = new GCSFileRepository(
+        config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when, then
@@ -171,14 +182,16 @@ describe('GCSFileRepository', () => {
   describe('getUrl', () => {
     it('return url for getting file', async () => {
       // given
-      const gcsFileRepository = new GCSFileRepository(
-        {
-          strategy: UploadStrategy.GCS,
-          options: {
-            bucket: 'test-bucket',
-          },
+      const config: GCSFileRepositoryConfiguration = {
+        strategy: UploadStrategy.GCS,
+        options: {
+          bucket: 'test-bucket',
         },
+      };
+      const gcsFileRepository = new GCSFileRepository(
+        config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -192,15 +205,17 @@ describe('GCSFileRepository', () => {
 
     it('return url for getting file with endPoint', async () => {
       // given
-      const gcsFileRepository = new GCSFileRepository(
-        {
-          strategy: UploadStrategy.GCS,
-          options: {
-            bucket: 'test-bucket',
-            endPoint: new URL('http://localhost:8080/path'),
-          },
+      const config: GCSFileRepositoryConfiguration = {
+        strategy: UploadStrategy.GCS,
+        options: {
+          bucket: 'test-bucket',
+          endPoint: new URL('http://localhost:8080/path'),
         },
+      };
+      const gcsFileRepository = new GCSFileRepository(
+        config,
         new DefaultGCSUploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when

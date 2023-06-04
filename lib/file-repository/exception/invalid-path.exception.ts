@@ -1,4 +1,4 @@
-export class InvalidAccessKeyIdException extends Error {
+export class InvalidPathException extends Error {
   constructor(message: string) {
     super(message);
   }

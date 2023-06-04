@@ -86,7 +86,7 @@ node_modules/
 .yarn/install-state.gz
 .pnp.*
 
-
-test.jpg
 dist
 credentials.json
+timeout.jpg
+

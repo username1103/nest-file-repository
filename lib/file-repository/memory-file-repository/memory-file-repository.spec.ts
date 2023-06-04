@@ -12,11 +12,13 @@ describe('MemoryFileRepository', () => {
         strategy: UploadStrategy.MEMORY,
         options: {
           path: './test',
+          bucket: 'test-bucket',
         },
       };
       const file = new File('test.txt', Buffer.from('hello'));
 
       const memoryFileRepository = new MemoryFileRepository(config);
+      memoryFileRepository.onModuleInit();
 
       // when
       const result = await memoryFileRepository.save(file);
@@ -31,10 +33,14 @@ describe('MemoryFileRepository', () => {
       // given
       const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
+        options: {
+          bucket: 'test-bucket',
+        },
       };
       const file = new File('test.txt', Buffer.from('hello'));
 
       const memoryFileRepository = new MemoryFileRepository(config);
+      memoryFileRepository.onModuleInit();
 
       // when
       const result = await memoryFileRepository.save(file);
@@ -49,9 +55,11 @@ describe('MemoryFileRepository', () => {
       // given
       const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
+        options: { bucket: 'test-bucket' },
       };
 
       const memoryFileRepository = new MemoryFileRepository(config);
+      memoryFileRepository.onModuleInit();
 
       // when
       const result = await memoryFileRepository.get('test.txt');
@@ -68,7 +76,9 @@ describe('MemoryFileRepository', () => {
 
       const memoryFileRepository = new MemoryFileRepository({
         strategy: UploadStrategy.MEMORY,
+        options: { bucket: 'test-bucket' },
       });
+      memoryFileRepository.onModuleInit();
 
       await memoryFileRepository.save(file);
 
@@ -85,8 +95,10 @@ describe('MemoryFileRepository', () => {
       // given
       const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
+        options: { bucket: 'test-bucket' },
       };
       const memoryFileRepository = new MemoryFileRepository(config);
+      memoryFileRepository.onModuleInit();
 
       // when
       const result = await memoryFileRepository.get('test-file.txt');
@@ -103,6 +115,7 @@ describe('MemoryFileRepository', () => {
         strategy: UploadStrategy.MEMORY,
         options: {
           endPoint: new URL('https://example.com/path1/path2'),
+          bucket: 'test-bucket',
         },
       });
       // when
@@ -116,6 +129,7 @@ describe('MemoryFileRepository', () => {
       // given
       const memoryFileRepository = new MemoryFileRepository({
         strategy: UploadStrategy.MEMORY,
+        options: { bucket: 'test-bucket' },
       });
 
       // when, then
@@ -132,6 +146,7 @@ describe('MemoryFileRepository', () => {
         strategy: UploadStrategy.MEMORY,
         options: {
           endPoint: new URL('https://example.com/path1/path2'),
+          bucket: 'test-bucket',
         },
       });
       // when
@@ -147,6 +162,7 @@ describe('MemoryFileRepository', () => {
       // given
       const memoryFileRepository = new MemoryFileRepository({
         strategy: UploadStrategy.MEMORY,
+        options: { bucket: 'test-bucket' },
       });
 
       // when, then
@@ -163,6 +179,7 @@ describe('MemoryFileRepository', () => {
         strategy: UploadStrategy.MEMORY,
         options: {
           endPoint: new URL('https://example.com/path1/path2'),
+          bucket: 'test-bucket',
         },
       });
       // when
@@ -178,6 +195,7 @@ describe('MemoryFileRepository', () => {
       // given
       const memoryFileRepository = new MemoryFileRepository({
         strategy: UploadStrategy.MEMORY,
+        options: { bucket: 'test-bucket' },
       });
 
       // when, then

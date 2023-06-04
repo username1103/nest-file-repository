@@ -4,6 +4,7 @@ import { InjectionToken } from '@nestjs/common/interfaces/modules/injection-toke
 import { Type } from '@nestjs/common/interfaces/type.interface';
 
 import { DEFAULT_ALIAS } from './constant';
+import { FilePathResolver } from './file-path-resolver';
 import { FileRepository } from './file-repository';
 import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
 import { getFileRepository } from './get-file-repository';
@@ -41,6 +42,7 @@ export class FileRepositoryModule {
         provide: repositoryAlias,
         useExisting: FileRepository,
       },
+      FilePathResolver,
     ];
 
     if (config.strategy === UploadStrategy.S3) {
