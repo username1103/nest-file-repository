@@ -30,7 +30,8 @@ describe('MemoryFileRepository', () => {
       // then
       expect(result).toBe('test/test.txt');
       const savedFile = await memoryFileRepository.get(result);
-      expect(file).toBe(savedFile);
+      expectNonNullable(savedFile);
+      expect(savedFile.filename).toBe('test/test.txt');
     });
 
     it('save file in storage when no path in options of config', async () => {
@@ -55,7 +56,8 @@ describe('MemoryFileRepository', () => {
       // then
       expect(result).toBe('test.txt');
       const savedFile = await memoryFileRepository.get(result);
-      expect(file).toBe(savedFile);
+      expectNonNullable(savedFile);
+      expect(savedFile.filename).toBe('test.txt');
     });
 
     it('return null when querying data that does not exist', async () => {
