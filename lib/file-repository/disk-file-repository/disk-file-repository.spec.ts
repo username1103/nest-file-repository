@@ -1,21 +1,27 @@
 import * as fs from 'fs/promises';
 
 import { DiskFileRepository } from './disk-file-repository';
+import { FilePathResolver } from './file-path-resolver';
 import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
 import { expectNonNullable } from '../../test/expect/expect-non-nullable';
 import { TimeoutException } from '../exception';
 import { InvalidPathException } from '../exception/invalid-path.exception';
+import { DiskFileRepositoryConfiguration } from '../interface/file-repository-configuration';
 
 describe('DiskFileRepository', () => {
   describe('save', () => {
     it('save file in disk', async () => {
       // given
       const file = new File('test.txt', Buffer.from('hello'));
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: { path: './sample/sample-nested', bucket: 'test-bucket' },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when
       const result = await diskFileRepository.save(file);
@@ -30,13 +36,17 @@ describe('DiskFileRepository', () => {
 
     it('save file in disk when no path in options of config', async () => {
       // given
-      const file = new File('test.txt', Buffer.from('hello'));
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           bucket: 'test-bucket',
         },
-      });
+      };
+      const file = new File('test.txt', Buffer.from('hello'));
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when
       const result = await diskFileRepository.save(file);
@@ -53,10 +63,14 @@ describe('DiskFileRepository', () => {
       // given
       const data = await fs.readFile('./test-bucket/sample.jpeg');
       const file = new File('timeout.jpg', data);
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: { path: '.', timeout: 1, bucket: 'test-bucket' },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() => diskFileRepository.save(file)).rejects.toThrow(
@@ -68,12 +82,16 @@ describe('DiskFileRepository', () => {
   describe('get', () => {
     it('return the file that exists in the path', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when
       const file = await diskFileRepository.get('sample.jpeg');
@@ -86,12 +104,16 @@ describe('DiskFileRepository', () => {
 
     it('return null if target is directory', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when
       const file = await diskFileRepository.get('sample');
@@ -102,12 +124,16 @@ describe('DiskFileRepository', () => {
 
     it('return null if file does not exist', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when
       const file = await diskFileRepository.get('not-exist-file.jpeg');
@@ -118,13 +144,17 @@ describe('DiskFileRepository', () => {
 
     it('throw TimeoutException if times out', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           timeout: 1,
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() => diskFileRepository.get('sample.jpeg')).rejects.toThrow(
@@ -134,12 +164,16 @@ describe('DiskFileRepository', () => {
 
     it('throw InvalidPathException if access file outside of bucket', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() =>
@@ -153,13 +187,17 @@ describe('DiskFileRepository', () => {
   describe('getUrl', () => {
     it('return url for getting file', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           endPoint: new URL('https://example.com/path1'),
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       // when
       const url = await diskFileRepository.getUrl('/path/path/test.txt');
 
@@ -169,12 +207,16 @@ describe('DiskFileRepository', () => {
 
     it('throw Error if url option does not exists', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() => diskFileRepository.getUrl('test.txt')).rejects.toThrow(
@@ -186,13 +228,17 @@ describe('DiskFileRepository', () => {
   describe('getSignedUrlForRead', () => {
     it('return url for getting file', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           endPoint: new URL('https://example.com/path1'),
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       // when
       const url = await diskFileRepository.getSignedUrlForRead(
         '/path/path/test.txt',
@@ -204,12 +250,16 @@ describe('DiskFileRepository', () => {
 
     it('throw Error if url option does not exists', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() =>
@@ -221,13 +271,17 @@ describe('DiskFileRepository', () => {
   describe('getSignedUrlForUpload', () => {
     it('return url for getting file', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           endPoint: new URL('https://example.com/path1'),
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       // when
       const url = await diskFileRepository.getSignedUrlForUpload(
         '/path/path/test.txt',
@@ -239,12 +293,16 @@ describe('DiskFileRepository', () => {
 
     it('throw Error if url option does not exists', async () => {
       // given
-      const diskFileRepository = new DiskFileRepository({
+      const config: DiskFileRepositoryConfiguration = {
         strategy: UploadStrategy.DISK,
         options: {
           bucket: 'test-bucket',
         },
-      });
+      };
+      const diskFileRepository = new DiskFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() =>

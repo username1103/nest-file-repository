@@ -4,6 +4,7 @@ import { InjectionToken } from '@nestjs/common/interfaces/modules/injection-toke
 import { Type } from '@nestjs/common/interfaces/type.interface';
 
 import { DEFAULT_ALIAS } from './constant';
+import { FilePathResolver } from './disk-file-repository/file-path-resolver';
 import { FileRepository } from './file-repository';
 import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
 import { getFileRepository } from './get-file-repository';
@@ -73,6 +74,10 @@ export class FileRepositoryModule {
       ) {
         imports.push(...(config.options.uploadOptionFactory.imports ?? []));
       }
+    }
+
+    if (config.strategy === UploadStrategy.DISK) {
+      providers.push(FilePathResolver);
     }
 
     return {

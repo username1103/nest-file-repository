@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 
 import { DEFAULT_ALIAS } from './constant';
 import { DiskFileRepository } from './disk-file-repository/disk-file-repository';
+import { FilePathResolver } from './disk-file-repository/file-path-resolver';
 import { FileRepository } from './file-repository';
 import { FileRepositoryModule } from './file-repository.module';
 import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
@@ -47,10 +48,12 @@ describe('FileRepositoryModule', () => {
     const fileRepository = module.get(FileRepository);
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
+    const filePathResolver = module.get(FilePathResolver);
 
     // then
     expect(fileRepository).toBeInstanceOf(DiskFileRepository);
     expect(aliasFileRepository).toBeInstanceOf(DiskFileRepository);
+    expect(filePathResolver).toBeInstanceOf(FilePathResolver);
     expect(config).toBe(diskConfig);
   });
 
