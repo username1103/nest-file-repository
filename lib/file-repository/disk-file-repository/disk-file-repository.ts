@@ -3,7 +3,7 @@ import * as fs from 'fs/promises';
 import { Mode, ObjectEncodingOptions, OpenMode } from 'node:fs';
 import * as path from 'path';
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
@@ -15,13 +15,13 @@ import {
 } from '../interface/file-repository-configuration';
 
 @Injectable()
-export class DiskFileRepository implements FileRepository {
+export class DiskFileRepository implements FileRepository, OnModuleInit {
   constructor(
     @Inject(CONFIG) private readonly config: DiskFileRepositoryConfiguration,
   ) {}
 
   async save(file: File): Promise<string> {
-    const filePath = path.join(this.config.options?.path ?? '', file.filename);
+    const filePath = this.getFilePath(file.filename);
 
     const options: ObjectEncodingOptions & {
       mode?: Mode;
@@ -35,8 +35,8 @@ export class DiskFileRepository implements FileRepository {
     }
 
     try {
-      if (this.config.options?.path) {
-        await fs.mkdir(this.config.options?.path, { recursive: true });
+      if (this.config.options.path) {
+        await fs.mkdir(this.getDirectoryPath(), { recursive: true });
       }
 
       await fs.writeFile(filePath, file.data, options);
@@ -55,7 +55,8 @@ export class DiskFileRepository implements FileRepository {
 
   async get(key: string): Promise<File | null> {
     try {
-      const fileStat = await fs.stat(key);
+      const filePath = this.getFilePath(key);
+      const fileStat = await fs.stat(filePath);
 
       if (!fileStat.isFile()) {
         return null;
@@ -72,7 +73,7 @@ export class DiskFileRepository implements FileRepository {
         options.signal = AbortSignal.timeout(this.config.options.timeout);
       }
 
-      const fileContents = await fs.readFile(key, options);
+      const fileContents = await fs.readFile(filePath, options);
 
       return new File(
         key,
@@ -114,5 +115,21 @@ export class DiskFileRepository implements FileRepository {
 
   async getSignedUrlForUpload(key: string): Promise<string> {
     return await this.getSignedUrlForRead(key);
+  }
+
+  async onModuleInit() {
+    await fs.mkdir(this.config.options.bucket);
+  }
+
+  private getBucketPath(): string {
+    return path.join(this.config.options.bucket);
+  }
+
+  private getDirectoryPath(): string {
+    return path.join(this.getBucketPath(), this.config.options.path ?? '');
+  }
+
+  private getFilePath(key: string): string {
+    return path.join(this.getDirectoryPath(), key);
   }
 }

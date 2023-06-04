@@ -13,14 +13,14 @@ describe('DiskFileRepository', () => {
       const file = new File('test.txt', Buffer.from('hello'));
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
-        options: { path: './sample/sample-nested' },
+        options: { path: './sample/sample-nested', bucket: 'test-bucket' },
       });
 
       // when
       const result = await diskFileRepository.save(file);
 
       // then
-      expect(result).toBe('sample/sample-nested/test.txt');
+      expect(result).toBe('test-bucket/sample/sample-nested/test.txt');
       const buffer = await fs.readFile(result);
       expect(buffer.toString()).toBe('hello');
 
@@ -32,31 +32,16 @@ describe('DiskFileRepository', () => {
       const file = new File('test.txt', Buffer.from('hello'));
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
+        options: {
+          bucket: 'test-bucket',
+        },
       });
 
       // when
       const result = await diskFileRepository.save(file);
 
       // then
-      expect(result).toBe('test.txt');
-      const buffer = await fs.readFile(result);
-      expect(buffer.toString()).toBe('hello');
-
-      await fs.unlink(result);
-    });
-
-    it('save file in disk if config doesnt have path', async () => {
-      // given
-      const file = new File('test.txt', Buffer.from('hello'));
-      const diskFileRepository = new DiskFileRepository({
-        strategy: UploadStrategy.DISK,
-      });
-
-      // when
-      const result = await diskFileRepository.save(file);
-
-      // then
-      expect(result).toBe('test.txt');
+      expect(result).toBe('test-bucket/test.txt');
       const buffer = await fs.readFile(result);
       expect(buffer.toString()).toBe('hello');
 
@@ -65,11 +50,11 @@ describe('DiskFileRepository', () => {
 
     it('throw TimeoutException if times out', async () => {
       // given
-      const data = await fs.readFile('./sample.jpeg');
-      const file = new File('test.jpg', data);
+      const data = await fs.readFile('./test-bucket/sample.jpeg');
+      const file = new File('timeout.jpg', data);
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
-        options: { path: '.', timeout: 1 },
+        options: { path: '.', timeout: 1, bucket: 'test-bucket' },
       });
 
       // when, then
@@ -84,6 +69,9 @@ describe('DiskFileRepository', () => {
       // given
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
+        options: {
+          bucket: 'test-bucket',
+        },
       });
 
       // when
@@ -99,10 +87,13 @@ describe('DiskFileRepository', () => {
       // given
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
+        options: {
+          bucket: 'test-bucket',
+        },
       });
 
       // when
-      const file = await diskFileRepository.get('scripts');
+      const file = await diskFileRepository.get('sample');
 
       // then
       expect(file).toBeNull();
@@ -112,10 +103,13 @@ describe('DiskFileRepository', () => {
       // given
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
+        options: {
+          bucket: 'test-bucket',
+        },
       });
 
       // when
-      const file = await diskFileRepository.get('invalid.jpeg');
+      const file = await diskFileRepository.get('not-exist-file.jpeg');
 
       // then
       expect(file).toBeNull();
@@ -127,6 +121,7 @@ describe('DiskFileRepository', () => {
         strategy: UploadStrategy.DISK,
         options: {
           timeout: 1,
+          bucket: 'test-bucket',
         },
       });
 
@@ -144,6 +139,7 @@ describe('DiskFileRepository', () => {
         strategy: UploadStrategy.DISK,
         options: {
           endPoint: new URL('https://example.com/path1'),
+          bucket: 'test-bucket',
         },
       });
       // when
@@ -157,6 +153,9 @@ describe('DiskFileRepository', () => {
       // given
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
+        options: {
+          bucket: 'test-bucket',
+        },
       });
 
       // when, then
@@ -173,6 +172,7 @@ describe('DiskFileRepository', () => {
         strategy: UploadStrategy.DISK,
         options: {
           endPoint: new URL('https://example.com/path1'),
+          bucket: 'test-bucket',
         },
       });
       // when
@@ -188,6 +188,9 @@ describe('DiskFileRepository', () => {
       // given
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
+        options: {
+          bucket: 'test-bucket',
+        },
       });
 
       // when, then
@@ -204,6 +207,7 @@ describe('DiskFileRepository', () => {
         strategy: UploadStrategy.DISK,
         options: {
           endPoint: new URL('https://example.com/path1'),
+          bucket: 'test-bucket',
         },
       });
       // when
@@ -219,6 +223,9 @@ describe('DiskFileRepository', () => {
       // given
       const diskFileRepository = new DiskFileRepository({
         strategy: UploadStrategy.DISK,
+        options: {
+          bucket: 'test-bucket',
+        },
       });
 
       // when, then

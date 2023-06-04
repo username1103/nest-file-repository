@@ -45,16 +45,18 @@ export interface GCSFileRepositoryConfiguration extends CommonConfiguration {
 export interface DiskFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.DISK;
 
-  options?: CommonOptions;
+  options: CommonOptions;
 }
 
 export interface MemoryFileRepositoryConfiguration extends CommonConfiguration {
   strategy: UploadStrategy.MEMORY;
 
-  options?: CommonOptions;
+  options: CommonOptions;
 }
 
 export interface CommonOptions {
+  bucket: string;
+
   path?: string;
 
   /**
