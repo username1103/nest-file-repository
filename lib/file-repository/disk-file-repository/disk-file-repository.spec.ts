@@ -5,6 +5,7 @@ import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
 import { expectNonNullable } from '../../test/expect/expect-non-nullable';
 import { TimeoutException } from '../exception';
+import { InvalidPathException } from '../exception/invalid-path.exception';
 
 describe('DiskFileRepository', () => {
   describe('save', () => {
@@ -128,6 +129,23 @@ describe('DiskFileRepository', () => {
       // when, then
       await expect(() => diskFileRepository.get('sample.jpeg')).rejects.toThrow(
         new TimeoutException('raise timeout: 1ms'),
+      );
+    });
+
+    it('throw InvalidPathException if access file outside of bucket', async () => {
+      // given
+      const diskFileRepository = new DiskFileRepository({
+        strategy: UploadStrategy.DISK,
+        options: {
+          bucket: 'test-bucket',
+        },
+      });
+
+      // when, then
+      await expect(() =>
+        diskFileRepository.get('../users/user1/secure-file.txt'),
+      ).rejects.toThrow(
+        new InvalidPathException('Can not access files outside of bucket'),
       );
     });
   });

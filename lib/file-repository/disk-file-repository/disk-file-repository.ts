@@ -8,6 +8,7 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
 import { TimeoutException } from '../exception';
+import { InvalidPathException } from '../exception/invalid-path.exception';
 import { FileRepository } from '../file-repository';
 import {
   CONFIG,
@@ -130,6 +131,12 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
   }
 
   private getFilePath(key: string): string {
-    return path.join(this.getDirectoryPath(), key);
+    const filePath = path.join(this.getDirectoryPath(), key);
+
+    if (path.relative(this.config.options.bucket, filePath).includes('../')) {
+      throw new InvalidPathException('Can not access files outside of bucket');
+    }
+
+    return filePath;
   }
 }
