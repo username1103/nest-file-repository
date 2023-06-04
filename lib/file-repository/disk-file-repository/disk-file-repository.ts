@@ -122,6 +122,6 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
   }
 
   async onModuleInit() {
-    await fs.mkdir(this.config.options.bucket);
+    await fs.mkdir(this.config.options.bucket, { recursive: true });
   }
 }
