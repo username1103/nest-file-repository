@@ -170,15 +170,13 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
       ? new URL(
           this.getPathStyleEndPoint(
             this.config.options.bucket,
-            this.config.options.region,
-            this.config.options.endPoint,
+            this.config.options.endPoint ?? this.getDefaultEndPoint(),
           ),
         )
       : new URL(
           this.getHostStyleEndPoint(
             this.config.options.bucket,
-            this.config.options.region,
-            this.config.options.endPoint,
+            this.config.options.endPoint ?? this.getDefaultEndPoint(),
           ),
         );
 
@@ -202,26 +200,16 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
     return await this.getSignedUrlForRead(key);
   }
 
-  private getPathStyleEndPoint(
-    bucket: string,
-    region: string,
-    endPoint?: URL,
-  ): string {
-    return `${
-      endPoint?.toString() ?? `https://s3.${region}.amazonaws.com`
-    }/${bucket}`;
+  private getPathStyleEndPoint(bucket: string, endPoint: URL): string {
+    return `${endPoint.toString()}/${bucket}`;
   }
 
-  private getHostStyleEndPoint(
-    bucket: string,
-    region: string,
-    endPoint?: URL,
-  ): string {
-    if (endPoint) {
-      return `${endPoint.protocol}//${bucket}.${endPoint.host}${endPoint.pathname}`;
-    }
+  private getHostStyleEndPoint(bucket: string, endPoint: URL): string {
+    return `${endPoint.protocol}//${bucket}.${endPoint.host}${endPoint.pathname}`;
+  }
 
-    return `https://${bucket}.s3.${region}.amazonaws.com`;
+  private getDefaultEndPoint(): URL {
+    return new URL(`https://s3.${this.config.options.region}.amazonaws.com`);
   }
 
   onModuleDestroy() {
