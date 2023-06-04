@@ -3,6 +3,7 @@ import { S3FileRepository } from './s3-file-repository';
 import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
 import { expectNonNullable } from '../../test/expect/expect-non-nullable';
+import { FilePathResolver } from '../disk-file-repository/file-path-resolver';
 import { NoSuchBucketException, TimeoutException } from '../exception';
 import { S3FileRepositoryConfiguration } from '../interface/file-repository-configuration';
 
@@ -28,6 +29,7 @@ describe('S3FileRepository', () => {
       const s3FileRepository = new S3FileRepository(
         config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       const file = new File('file.txt', Buffer.from('hello'));
@@ -58,6 +60,7 @@ describe('S3FileRepository', () => {
       const s3FileRepository = new S3FileRepository(
         config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       const file = new File('file.txt', Buffer.from('hello'));
@@ -90,6 +93,7 @@ describe('S3FileRepository', () => {
       const s3FileRepository = new S3FileRepository(
         config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       const file = new File('file.jpeg', Buffer.from('hello'));
@@ -120,6 +124,7 @@ describe('S3FileRepository', () => {
       const s3FileRepository = new S3FileRepository(
         config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       const file = new File('file.jpeg', Buffer.from('hello'));
@@ -134,22 +139,24 @@ describe('S3FileRepository', () => {
   describe('get', () => {
     it('return file that exists in the key', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            region: 'test',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            bucket: 'test-bucket',
-            acl: 'public-read',
-            endPoint: new URL('http://localhost:4566'),
-            forcePathStyle: true,
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          region: 'test',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          bucket: 'test-bucket',
+          acl: 'public-read',
+          endPoint: new URL('http://localhost:4566'),
+          forcePathStyle: true,
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -182,6 +189,7 @@ describe('S3FileRepository', () => {
       const s3FileRepository = new S3FileRepository(
         config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when, then
@@ -211,6 +219,7 @@ describe('S3FileRepository', () => {
       const s3FileRepository = new S3FileRepository(
         config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when, then
@@ -239,6 +248,7 @@ describe('S3FileRepository', () => {
       const s3FileRepository = new S3FileRepository(
         config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -252,19 +262,21 @@ describe('S3FileRepository', () => {
   describe('getUrl', () => {
     it('return url for getting file', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -278,20 +290,22 @@ describe('S3FileRepository', () => {
 
     it('return url for getting file with endPoint', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            endPoint: new URL('http://localhost:4566/test/test'),
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          endPoint: new URL('http://localhost:4566/test/test'),
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -305,20 +319,22 @@ describe('S3FileRepository', () => {
 
     it('return url for getting file with forcePathStyle', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            forcePathStyle: true,
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          forcePathStyle: true,
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -332,21 +348,23 @@ describe('S3FileRepository', () => {
 
     it('return url for getting file with forcePathStyle and endPoint', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            forcePathStyle: true,
-            endPoint: new URL('http://localhost:4566/test/test'),
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          forcePathStyle: true,
+          endPoint: new URL('http://localhost:4566/test/test'),
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -362,19 +380,21 @@ describe('S3FileRepository', () => {
   describe('getSignedUrlForRead', () => {
     it('return signedUrl from key', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
       // when
       const result = await s3FileRepository.getSignedUrlForRead('test.txt');
@@ -392,20 +412,22 @@ describe('S3FileRepository', () => {
 
     it('return signedUrl from key with forcePathStyle', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            forcePathStyle: true,
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          forcePathStyle: true,
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
       // when
       const result = await s3FileRepository.getSignedUrlForRead('test.txt');
@@ -423,20 +445,22 @@ describe('S3FileRepository', () => {
 
     it('return signedUrl for key with endPoint', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            endPoint: new URL('http://localhost:4566/test/test'),
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          endPoint: new URL('http://localhost:4566/test/test'),
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -457,21 +481,23 @@ describe('S3FileRepository', () => {
 
     it('return url for getting file with forcePathStyle and endPoint', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            forcePathStyle: true,
-            endPoint: new URL('http://localhost:4566/test/test'),
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          forcePathStyle: true,
+          endPoint: new URL('http://localhost:4566/test/test'),
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -494,19 +520,21 @@ describe('S3FileRepository', () => {
   describe('getSignedUrlForUpload', () => {
     it('return signedUrl from key', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
       // when
       const result = await s3FileRepository.getSignedUrlForUpload('test.txt');
@@ -524,20 +552,22 @@ describe('S3FileRepository', () => {
 
     it('return signedUrl from key with forcePathStyle', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            forcePathStyle: true,
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          forcePathStyle: true,
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
       // when
       const result = await s3FileRepository.getSignedUrlForUpload('test.txt');
@@ -555,20 +585,22 @@ describe('S3FileRepository', () => {
 
     it('return signedUrl for key with endPoint', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            endPoint: new URL('http://localhost:4566/test/test'),
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          endPoint: new URL('http://localhost:4566/test/test'),
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when
@@ -589,21 +621,23 @@ describe('S3FileRepository', () => {
 
     it('return url for getting file with forcePathStyle and endPoint', async () => {
       // given
-      const s3FileRepository = new S3FileRepository(
-        {
-          strategy: UploadStrategy.S3,
-          options: {
-            bucket: 'test-bucket',
-            credentials: {
-              accessKeyId: 'test',
-              secretAccessKey: 'test',
-            },
-            region: 'ap-northeast-2',
-            forcePathStyle: true,
-            endPoint: new URL('http://localhost:4566/test/test'),
+      const config: S3FileRepositoryConfiguration = {
+        strategy: UploadStrategy.S3,
+        options: {
+          bucket: 'test-bucket',
+          credentials: {
+            accessKeyId: 'test',
+            secretAccessKey: 'test',
           },
+          region: 'ap-northeast-2',
+          forcePathStyle: true,
+          endPoint: new URL('http://localhost:4566/test/test'),
         },
+      };
+      const s3FileRepository = new S3FileRepository(
+        config,
         new DefaultS3UploadOptionFactory(),
+        new FilePathResolver(config),
       );
 
       // when

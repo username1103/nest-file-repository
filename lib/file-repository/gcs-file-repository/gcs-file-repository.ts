@@ -1,11 +1,10 @@
-import path from 'path';
-
 import { Storage } from '@google-cloud/storage';
 import { ApiError } from '@google-cloud/storage/build/src/nodejs-common';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
+import { FilePathResolver } from '../disk-file-repository/file-path-resolver';
 import {
   InvalidAccessKeyException,
   NoSuchBucketException,
@@ -29,6 +28,7 @@ export class GCSFileRepository implements FileRepository {
     @Inject(CONFIG) private readonly config: GCSFileRepositoryConfiguration,
     @Inject(GCS_UPLOAD_OPTION_FACTORY)
     private readonly uploadOptionFactory: GCSUploadOptionFactory,
+    private readonly filePathResolver: FilePathResolver,
   ) {
     this.client = new Storage({
       keyFilename: this.config.options.keyFile,
@@ -39,7 +39,7 @@ export class GCSFileRepository implements FileRepository {
   }
 
   async save(file: File): Promise<string> {
-    const filePath = path.join(this.config.options.path ?? '', file.filename);
+    const filePath = this.filePathResolver.getKeyByFile(file);
 
     const options = this.uploadOptionFactory.getOptions(
       new File(filePath, file.data, file.mimetype),

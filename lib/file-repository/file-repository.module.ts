@@ -42,6 +42,7 @@ export class FileRepositoryModule {
         provide: repositoryAlias,
         useExisting: FileRepository,
       },
+      FilePathResolver,
     ];
 
     if (config.strategy === UploadStrategy.S3) {
@@ -74,10 +75,6 @@ export class FileRepositoryModule {
       ) {
         imports.push(...(config.options.uploadOptionFactory.imports ?? []));
       }
-    }
-
-    if (config.strategy === UploadStrategy.DISK) {
-      providers.push(FilePathResolver);
     }
 
     return {

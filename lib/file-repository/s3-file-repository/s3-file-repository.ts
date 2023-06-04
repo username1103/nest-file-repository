@@ -1,5 +1,3 @@
-import path from 'path';
-
 import {
   GetObjectCommand,
   PutObjectCommand,
@@ -11,6 +9,7 @@ import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
+import { FilePathResolver } from '../disk-file-repository/file-path-resolver';
 import {
   InvalidAccessKeyException,
   NoSuchBucketException,
@@ -35,6 +34,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
     @Inject(CONFIG) private readonly config: S3FileRepositoryConfiguration,
     @Inject(S3_UPLOAD_OPTION_FACTORY)
     private readonly s3UploadOptionFactory: S3UploadOptionFactory,
+    private readonly filePathResolver: FilePathResolver,
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
@@ -51,10 +51,10 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
   }
 
   async save(file: File): Promise<string> {
-    const filePath = path.join(this.config.options?.path ?? '', file.filename);
+    const key = this.filePathResolver.getKeyByFile(file);
 
     const options = this.s3UploadOptionFactory.getOptions(
-      new File(filePath, file.data, file.mimetype),
+      new File(key, file.data, file.mimetype),
       this.config,
     );
 
@@ -111,7 +111,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
       throw e;
     }
 
-    return filePath;
+    return key;
   }
 
   async get(key: string): Promise<File | null> {

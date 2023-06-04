@@ -6,14 +6,12 @@ import { File } from '../../File';
 import { InvalidPathException } from '../exception/invalid-path.exception';
 import {
   CONFIG,
-  DiskFileRepositoryConfiguration,
+  FileRepositoryConfiguration,
 } from '../interface/file-repository-configuration';
 
 @Injectable()
 export class FilePathResolver {
-  constructor(
-    @Inject(CONFIG) private config: DiskFileRepositoryConfiguration,
-  ) {}
+  constructor(@Inject(CONFIG) private config: FileRepositoryConfiguration) {}
 
   getPathByFile(file: File): string {
     const filePath = path.join(this.getDirectoryPath(), file.filename);
