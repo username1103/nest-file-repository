@@ -1,11 +1,10 @@
-import path from 'path';
-
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 
 import { Bucket } from './bucket';
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
 import { NoSuchBucketException } from '../exception';
+import { FilePathResolver } from '../file-path-resolver';
 import { FileRepository } from '../file-repository';
 import {
   CONFIG,
@@ -17,10 +16,11 @@ export class MemoryFileRepository implements FileRepository, OnModuleInit {
   private readonly storage = new Map<string, Bucket>();
   constructor(
     @Inject(CONFIG) private readonly config: MemoryFileRepositoryConfiguration,
+    private readonly filePathResolver: FilePathResolver,
   ) {}
 
   async save(file: File): Promise<string> {
-    const filePath = path.join(this.config.options.path ?? '', file.filename);
+    const key = this.filePathResolver.getKeyByFile(file);
 
     const bucket = this.storage.get(this.config.options.bucket);
     if (!bucket) {
@@ -29,9 +29,9 @@ export class MemoryFileRepository implements FileRepository, OnModuleInit {
       );
     }
 
-    bucket.set(filePath, file);
+    bucket.set(key, new File(key, file.data, file.mimetype));
 
-    return filePath;
+    return key;
   }
 
   async get(key: string): Promise<File | null> {

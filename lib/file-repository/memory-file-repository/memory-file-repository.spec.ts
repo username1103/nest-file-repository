@@ -2,6 +2,7 @@ import { MemoryFileRepository } from './memory-file-repository';
 import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
 import { expectNonNullable } from '../../test/expect/expect-non-nullable';
+import { FilePathResolver } from '../file-path-resolver';
 import { MemoryFileRepositoryConfiguration } from '../interface/file-repository-configuration';
 
 describe('MemoryFileRepository', () => {
@@ -17,7 +18,10 @@ describe('MemoryFileRepository', () => {
       };
       const file = new File('test.txt', Buffer.from('hello'));
 
-      const memoryFileRepository = new MemoryFileRepository(config);
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       memoryFileRepository.onModuleInit();
 
       // when
@@ -39,7 +43,10 @@ describe('MemoryFileRepository', () => {
       };
       const file = new File('test.txt', Buffer.from('hello'));
 
-      const memoryFileRepository = new MemoryFileRepository(config);
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       memoryFileRepository.onModuleInit();
 
       // when
@@ -58,7 +65,10 @@ describe('MemoryFileRepository', () => {
         options: { bucket: 'test-bucket' },
       };
 
-      const memoryFileRepository = new MemoryFileRepository(config);
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       memoryFileRepository.onModuleInit();
 
       // when
@@ -74,10 +84,14 @@ describe('MemoryFileRepository', () => {
       // given
       const file = new File('test.txt', Buffer.from('123'));
 
-      const memoryFileRepository = new MemoryFileRepository({
+      const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
         options: { bucket: 'test-bucket' },
-      });
+      };
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       memoryFileRepository.onModuleInit();
 
       await memoryFileRepository.save(file);
@@ -97,7 +111,10 @@ describe('MemoryFileRepository', () => {
         strategy: UploadStrategy.MEMORY,
         options: { bucket: 'test-bucket' },
       };
-      const memoryFileRepository = new MemoryFileRepository(config);
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       memoryFileRepository.onModuleInit();
 
       // when
@@ -111,13 +128,17 @@ describe('MemoryFileRepository', () => {
   describe('getUrl', () => {
     it('return url for getting file', async () => {
       // given
-      const memoryFileRepository = new MemoryFileRepository({
+      const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
         options: {
           endPoint: new URL('https://example.com/path1/path2'),
           bucket: 'test-bucket',
         },
-      });
+      };
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       // when
       const url = await memoryFileRepository.getUrl('/path2/test.txt');
 
@@ -127,10 +148,14 @@ describe('MemoryFileRepository', () => {
 
     it('throw Error if url option does not exists', async () => {
       // given
-      const memoryFileRepository = new MemoryFileRepository({
+      const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
         options: { bucket: 'test-bucket' },
-      });
+      };
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() =>
@@ -142,13 +167,17 @@ describe('MemoryFileRepository', () => {
   describe('getSignedUrlForRead', () => {
     it('return url for getting file', async () => {
       // given
-      const memoryFileRepository = new MemoryFileRepository({
+      const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
         options: {
           endPoint: new URL('https://example.com/path1/path2'),
           bucket: 'test-bucket',
         },
-      });
+      };
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       // when
       const url = await memoryFileRepository.getSignedUrlForRead(
         '/path2/test.txt',
@@ -160,10 +189,14 @@ describe('MemoryFileRepository', () => {
 
     it('throw Error if url option does not exists', async () => {
       // given
-      const memoryFileRepository = new MemoryFileRepository({
+      const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
         options: { bucket: 'test-bucket' },
-      });
+      };
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() =>
@@ -175,13 +208,17 @@ describe('MemoryFileRepository', () => {
   describe('getSignedUrlForUpload', () => {
     it('return url for getting file', async () => {
       // given
-      const memoryFileRepository = new MemoryFileRepository({
+      const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
         options: {
           endPoint: new URL('https://example.com/path1/path2'),
           bucket: 'test-bucket',
         },
-      });
+      };
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
       // when
       const url = await memoryFileRepository.getSignedUrlForUpload(
         '/path2/test.txt',
@@ -193,10 +230,14 @@ describe('MemoryFileRepository', () => {
 
     it('throw Error if url option does not exists', async () => {
       // given
-      const memoryFileRepository = new MemoryFileRepository({
+      const config: MemoryFileRepositoryConfiguration = {
         strategy: UploadStrategy.MEMORY,
         options: { bucket: 'test-bucket' },
-      });
+      };
+      const memoryFileRepository = new MemoryFileRepository(
+        config,
+        new FilePathResolver(config),
+      );
 
       // when, then
       await expect(() =>
