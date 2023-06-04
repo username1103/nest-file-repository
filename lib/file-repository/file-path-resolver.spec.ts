@@ -1,7 +1,7 @@
+import { InvalidPathException } from './exception/invalid-path.exception';
 import { FilePathResolver } from './file-path-resolver';
-import { UploadStrategy } from '../../enum';
-import { File } from '../../File';
-import { InvalidPathException } from '../exception/invalid-path.exception';
+import { UploadStrategy } from '../enum';
+import { File } from '../File';
 
 describe('FilePathResolver', () => {
   describe('getPathByFile', () => {

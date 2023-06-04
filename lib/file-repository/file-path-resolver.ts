@@ -2,12 +2,12 @@ import path from 'path';
 
 import { Inject, Injectable } from '@nestjs/common';
 
-import { File } from '../../File';
-import { InvalidPathException } from '../exception/invalid-path.exception';
+import { InvalidPathException } from './exception/invalid-path.exception';
 import {
   CONFIG,
   FileRepositoryConfiguration,
-} from '../interface/file-repository-configuration';
+} from './interface/file-repository-configuration';
+import { File } from '../File';
 
 @Injectable()
 export class FilePathResolver {

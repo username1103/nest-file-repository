@@ -4,12 +4,12 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
-import { FilePathResolver } from '../disk-file-repository/file-path-resolver';
 import {
   InvalidAccessKeyException,
   NoSuchBucketException,
   TimeoutException,
 } from '../exception';
+import { FilePathResolver } from '../file-path-resolver';
 import { FileRepository } from '../file-repository';
 import {
   CONFIG,

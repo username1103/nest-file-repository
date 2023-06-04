@@ -1,12 +1,12 @@
 import * as fs from 'fs/promises';
 
 import { DiskFileRepository } from './disk-file-repository';
-import { FilePathResolver } from './file-path-resolver';
 import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
 import { expectNonNullable } from '../../test/expect/expect-non-nullable';
 import { TimeoutException } from '../exception';
 import { InvalidPathException } from '../exception/invalid-path.exception';
+import { FilePathResolver } from '../file-path-resolver';
 import { DiskFileRepositoryConfiguration } from '../interface/file-repository-configuration';
 
 describe('DiskFileRepository', () => {

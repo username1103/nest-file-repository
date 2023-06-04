@@ -3,8 +3,8 @@ import { GCSFileRepository } from './gcs-file-repository';
 import { UploadStrategy } from '../../enum';
 import { File } from '../../File';
 import { expectNonNullable } from '../../test/expect/expect-non-nullable';
-import { FilePathResolver } from '../disk-file-repository/file-path-resolver';
 import { NoSuchBucketException, TimeoutException } from '../exception';
+import { FilePathResolver } from '../file-path-resolver';
 import { GCSFileRepositoryConfiguration } from '../interface/file-repository-configuration';
 
 describe('GCSFileRepository', () => {

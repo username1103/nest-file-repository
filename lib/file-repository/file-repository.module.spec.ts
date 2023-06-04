@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 
 import { DEFAULT_ALIAS } from './constant';
 import { DiskFileRepository } from './disk-file-repository/disk-file-repository';
-import { FilePathResolver } from './disk-file-repository/file-path-resolver';
+import { FilePathResolver } from './file-path-resolver';
 import { FileRepository } from './file-repository';
 import { FileRepositoryModule } from './file-repository.module';
 import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';

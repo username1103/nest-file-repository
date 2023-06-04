@@ -4,10 +4,10 @@ import { Mode, ObjectEncodingOptions, OpenMode } from 'node:fs';
 
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 
-import { FilePathResolver } from './file-path-resolver';
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
 import { TimeoutException } from '../exception';
+import { FilePathResolver } from '../file-path-resolver';
 import { FileRepository } from '../file-repository';
 import {
   CONFIG,
