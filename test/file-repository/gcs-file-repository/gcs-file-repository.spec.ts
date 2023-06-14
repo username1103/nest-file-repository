@@ -1,11 +1,11 @@
-import { DefaultGCSUploadOptionFactory } from './default-gcs-upload-option-factory';
-import { GCSFileRepository } from './gcs-file-repository';
-import { UploadStrategy } from '../../enum';
-import { File } from '../../File';
-import { expectNonNullable } from '../../test/expect/expect-non-nullable';
-import { NoSuchBucketException, TimeoutException } from '../exception';
-import { FilePathResolver } from '../file-path-resolver';
-import { GCSFileRepositoryConfiguration } from '../interface/file-repository-configuration';
+import { UploadStrategy } from '../../../lib';
+import { File } from '../../../lib';
+import { NoSuchBucketException, TimeoutException } from '../../../lib';
+import { GCSFileRepositoryConfiguration } from '../../../lib';
+import { FilePathResolver } from '../../../lib/file-repository/file-path-resolver';
+import { DefaultGCSUploadOptionFactory } from '../../../lib/file-repository/gcs-file-repository/default-gcs-upload-option-factory';
+import { GCSFileRepository } from '../../../lib/file-repository/gcs-file-repository/gcs-file-repository';
+import { expectNonNullable } from '../../expect/expect-non-nullable';
 
 describe('GCSFileRepository', () => {
   describe('save', () => {

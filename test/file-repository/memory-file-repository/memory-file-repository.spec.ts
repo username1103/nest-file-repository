@@ -1,9 +1,9 @@
-import { MemoryFileRepository } from './memory-file-repository';
-import { UploadStrategy } from '../../enum';
-import { File } from '../../File';
-import { expectNonNullable } from '../../test/expect/expect-non-nullable';
-import { FilePathResolver } from '../file-path-resolver';
-import { MemoryFileRepositoryConfiguration } from '../interface/file-repository-configuration';
+import { UploadStrategy } from '../../../lib';
+import { File } from '../../../lib';
+import { MemoryFileRepositoryConfiguration } from '../../../lib';
+import { FilePathResolver } from '../../../lib/file-repository/file-path-resolver';
+import { MemoryFileRepository } from '../../../lib/file-repository/memory-file-repository/memory-file-repository';
+import { expectNonNullable } from '../../expect/expect-non-nullable';
 
 describe('MemoryFileRepository', () => {
   describe('save', () => {

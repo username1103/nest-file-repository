@@ -1,43 +1,44 @@
-import { Injectable, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
-import { DEFAULT_ALIAS } from './constant';
-import { DiskFileRepository } from './disk-file-repository/disk-file-repository';
-import { FilePathResolver } from './file-path-resolver';
-import { FileRepository } from './file-repository';
-import { FileRepositoryModule } from './file-repository.module';
-import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
-import { GCSFileRepository } from './gcs-file-repository/gcs-file-repository';
-import { ERROR_HANDLER } from './interface/error-handler';
-import {
-  CONFIG,
-  DiskFileRepositoryConfiguration,
-  GCSFileRepositoryConfiguration,
-  MemoryFileRepositoryConfiguration,
-  S3FileRepositoryConfiguration,
-} from './interface/file-repository-configuration';
-import {
-  GCS_UPLOAD_OPTION_FACTORY,
-  GCSUploadOption,
-  GCSUploadOptionFactory,
-} from './interface/gcs-upload-option-factory';
-import {
-  S3_UPLOAD_OPTION_FACTORY,
-  S3UploadOption,
-  S3UploadOptionFactory,
-} from './interface/s3-upload-option-factory';
-import { MemoryFileRepository } from './memory-file-repository/memory-file-repository';
-import { DefaultS3ErrorHandler } from './s3-file-repository/default-s3-error-handler';
-import { DefaultS3UploadOptionFactory } from './s3-file-repository/default-s3-upload-option-factory';
-import { S3FileRepository } from './s3-file-repository/s3-file-repository';
 import {
   StubS3ErrorHandler,
-  StubS3FactoryHandler,
+  StubS3ErrorHandlerInjectedNameGenerator,
 } from './s3-file-repository/stub-s3-error-handler';
-import { UploadStrategy } from '../enum';
-import { File } from '../File';
-import { NAME_GENERATOR, NameGenerator } from '../interface/name-generator';
-import { IdentityNameGenerator } from '../util/identity-name-generator';
+import {
+  StubS3OptionFactory,
+  StubS3OptionFactoryInjectedNameGenerator,
+} from './s3-file-repository/stub-s3-option-factory';
+import {
+  CONFIG,
+  DEFAULT_ALIAS,
+  DefaultS3UploadOptionFactory,
+  DiskFileRepositoryConfiguration,
+  File,
+  FileRepository,
+  FileRepositoryModule,
+  GCS_UPLOAD_OPTION_FACTORY,
+  GCSFileRepositoryConfiguration,
+  GCSUploadOption,
+  GCSUploadOptionFactory,
+  MemoryFileRepositoryConfiguration,
+  S3_UPLOAD_OPTION_FACTORY,
+  S3FileRepositoryConfiguration,
+  UploadStrategy,
+} from '../../lib';
+import { DiskFileRepository } from '../../lib/file-repository/disk-file-repository/disk-file-repository';
+import { FilePathResolver } from '../../lib/file-repository/file-path-resolver';
+import { DefaultGCSUploadOptionFactory } from '../../lib/file-repository/gcs-file-repository/default-gcs-upload-option-factory';
+import { GCSFileRepository } from '../../lib/file-repository/gcs-file-repository/gcs-file-repository';
+import { ERROR_HANDLER } from '../../lib/file-repository/interface/error-handler';
+import { MemoryFileRepository } from '../../lib/file-repository/memory-file-repository/memory-file-repository';
+import { DefaultS3ErrorHandler } from '../../lib/file-repository/s3-file-repository/default-s3-error-handler';
+import { S3FileRepository } from '../../lib/file-repository/s3-file-repository/s3-file-repository';
+import {
+  NAME_GENERATOR,
+  NameGenerator,
+} from '../../lib/interface/name-generator';
+import { IdentityNameGenerator } from '../../lib/util/identity-name-generator';
 
 describe('FileRepositoryModule', () => {
   it('make disk file repository by disk config', async () => {
@@ -98,19 +99,6 @@ describe('FileRepositoryModule', () => {
 
   it('make s3 file repository by s3 config with custom upload options factory', async () => {
     // given
-    @Injectable()
-    class Factory implements S3UploadOptionFactory {
-      getOptions(
-        file: File,
-        config: S3FileRepositoryConfiguration,
-      ): S3UploadOption {
-        return {
-          bucket: config.options.bucket,
-          key: file.filename,
-          body: file.data,
-        };
-      }
-    }
     const s3Config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
@@ -121,7 +109,7 @@ describe('FileRepositoryModule', () => {
         acl: 'public-read',
         bucket: 'test',
         region: 'test',
-        uploadOptionFactory: Factory,
+        uploadOptionFactory: StubS3OptionFactory,
         errorHandler: StubS3ErrorHandler,
       },
     };
@@ -139,26 +127,13 @@ describe('FileRepositoryModule', () => {
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
-    expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(s3UploadOptionFactory).toBeInstanceOf(StubS3OptionFactory);
     expect(errorHandler).toBeInstanceOf(StubS3ErrorHandler);
     expect(config).toBe(s3Config);
   });
 
   it('make s3 file repository by s3 config with custom upload options factory by ClassProvider', async () => {
     // given
-    @Injectable()
-    class Factory implements S3UploadOptionFactory {
-      getOptions(
-        file: File,
-        config: S3FileRepositoryConfiguration,
-      ): S3UploadOption {
-        return {
-          bucket: config.options.bucket,
-          key: file.filename,
-          body: file.data,
-        };
-      }
-    }
     const s3Config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
@@ -169,7 +144,7 @@ describe('FileRepositoryModule', () => {
         acl: 'public-read',
         bucket: 'test',
         region: 'test',
-        uploadOptionFactory: { useClass: Factory },
+        uploadOptionFactory: { useClass: StubS3OptionFactory },
         errorHandler: { useClass: StubS3ErrorHandler },
       },
     };
@@ -187,26 +162,13 @@ describe('FileRepositoryModule', () => {
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
-    expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(s3UploadOptionFactory).toBeInstanceOf(StubS3OptionFactory);
     expect(errorHandler).toBeInstanceOf(StubS3ErrorHandler);
     expect(config).toBe(s3Config);
   });
 
   it('make s3 file repository by s3 config with custom upload options factory by ValueProvide', async () => {
     // given
-    @Injectable()
-    class Factory implements S3UploadOptionFactory {
-      getOptions(
-        file: File,
-        config: S3FileRepositoryConfiguration,
-      ): S3UploadOption {
-        return {
-          bucket: config.options.bucket,
-          key: file.filename,
-          body: file.data,
-        };
-      }
-    }
     const s3Config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
@@ -217,7 +179,7 @@ describe('FileRepositoryModule', () => {
         acl: 'public-read',
         bucket: 'test',
         region: 'test',
-        uploadOptionFactory: { useValue: new Factory() },
+        uploadOptionFactory: { useValue: new StubS3OptionFactory() },
         errorHandler: { useValue: new StubS3ErrorHandler() },
       },
     };
@@ -235,7 +197,7 @@ describe('FileRepositoryModule', () => {
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
-    expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(s3UploadOptionFactory).toBeInstanceOf(StubS3OptionFactory);
     expect(s3UploadOptionFactory).toBe(
       (s3Config.options.uploadOptionFactory as any).useValue,
     );
@@ -249,21 +211,7 @@ describe('FileRepositoryModule', () => {
       exports: [NAME_GENERATOR],
     })
     class TestModule {}
-    @Injectable()
-    class Factory implements S3UploadOptionFactory {
-      constructor(readonly nameGenerator: NameGenerator) {}
 
-      getOptions(
-        file: File,
-        config: S3FileRepositoryConfiguration,
-      ): S3UploadOption {
-        return {
-          bucket: config.options.bucket,
-          key: this.nameGenerator.generate(file),
-          body: file.data,
-        };
-      }
-    }
     const s3Config: S3FileRepositoryConfiguration = {
       strategy: UploadStrategy.S3,
       options: {
@@ -277,13 +225,13 @@ describe('FileRepositoryModule', () => {
         uploadOptionFactory: {
           imports: [TestModule],
           useFactory: (nameGenerator: NameGenerator) =>
-            new Factory(nameGenerator),
+            new StubS3OptionFactoryInjectedNameGenerator(nameGenerator),
           inject: [NAME_GENERATOR],
         },
         errorHandler: {
           imports: [TestModule],
           useFactory: (nameGenerator: NameGenerator) =>
-            new StubS3FactoryHandler(nameGenerator),
+            new StubS3ErrorHandlerInjectedNameGenerator(nameGenerator),
           inject: [NAME_GENERATOR],
         },
       },
@@ -297,20 +245,28 @@ describe('FileRepositoryModule', () => {
     const fileRepository = module.get(FileRepository);
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
-    const s3UploadOptionFactory = module.get<Factory>(S3_UPLOAD_OPTION_FACTORY);
+    const s3UploadOptionFactory =
+      module.get<StubS3OptionFactoryInjectedNameGenerator>(
+        S3_UPLOAD_OPTION_FACTORY,
+      );
     const testModule = module.get(TestModule);
-    const errorHandler = module.get<StubS3FactoryHandler>(ERROR_HANDLER);
+    const errorHandler =
+      module.get<StubS3ErrorHandlerInjectedNameGenerator>(ERROR_HANDLER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
-    expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(s3UploadOptionFactory).toBeInstanceOf(
+      StubS3OptionFactoryInjectedNameGenerator,
+    );
     expect(s3UploadOptionFactory.nameGenerator).toBeInstanceOf(
       IdentityNameGenerator,
     );
     expect(testModule).toBeInstanceOf(TestModule);
-    expect(errorHandler).toBeInstanceOf(StubS3FactoryHandler);
-    expect(errorHandler.nameGanerator).toBeInstanceOf(StubS3FactoryHandler);
+    expect(errorHandler).toBeInstanceOf(
+      StubS3ErrorHandlerInjectedNameGenerator,
+    );
+    expect(errorHandler.nameGenerator).toBeInstanceOf(IdentityNameGenerator);
     expect(config).toBe(s3Config);
   });
 

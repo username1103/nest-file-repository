@@ -1,13 +1,13 @@
 import * as fs from 'fs/promises';
 
-import { DiskFileRepository } from './disk-file-repository';
-import { UploadStrategy } from '../../enum';
-import { File } from '../../File';
-import { expectNonNullable } from '../../test/expect/expect-non-nullable';
-import { TimeoutException } from '../exception';
-import { InvalidPathException } from '../exception/invalid-path.exception';
-import { FilePathResolver } from '../file-path-resolver';
-import { DiskFileRepositoryConfiguration } from '../interface/file-repository-configuration';
+import { UploadStrategy } from '../../../lib';
+import { File } from '../../../lib';
+import { TimeoutException } from '../../../lib';
+import { DiskFileRepositoryConfiguration } from '../../../lib';
+import { DiskFileRepository } from '../../../lib/file-repository/disk-file-repository/disk-file-repository';
+import { InvalidPathException } from '../../../lib/file-repository/exception/invalid-path.exception';
+import { FilePathResolver } from '../../../lib/file-repository/file-path-resolver';
+import { expectNonNullable } from '../../expect/expect-non-nullable';
 
 describe('DiskFileRepository', () => {
   describe('save', () => {

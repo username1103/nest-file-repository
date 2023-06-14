@@ -1,11 +1,13 @@
-import { DefaultS3UploadOptionFactory } from './default-s3-upload-option-factory';
-import { S3FileRepository } from './s3-file-repository';
-import { UploadStrategy } from '../../enum';
-import { File } from '../../File';
-import { expectNonNullable } from '../../test/expect/expect-non-nullable';
-import { NoSuchBucketException, TimeoutException } from '../exception';
-import { FilePathResolver } from '../file-path-resolver';
-import { S3FileRepositoryConfiguration } from '../interface/file-repository-configuration';
+import { S3UploadOptionFactory, UploadStrategy } from '../../../lib';
+import { File } from '../../../lib';
+import { NoSuchBucketException, TimeoutException } from '../../../lib';
+import { S3FileRepositoryConfiguration } from '../../../lib';
+import { DefaultS3UploadOptionFactory } from '../../../lib';
+import { FilePathResolver } from '../../../lib/file-repository/file-path-resolver';
+import { ErrorHandler } from '../../../lib/file-repository/interface/error-handler';
+import { DefaultS3ErrorHandler } from '../../../lib/file-repository/s3-file-repository/default-s3-error-handler';
+import { S3FileRepository } from '../../../lib/file-repository/s3-file-repository/s3-file-repository';
+import { expectNonNullable } from '../../expect/expect-non-nullable';
 
 describe('S3FileRepository', () => {
   describe('save', () => {
@@ -26,11 +28,7 @@ describe('S3FileRepository', () => {
           acl: 'public-read',
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       const file = new File('file.txt', Buffer.from('hello'));
 
@@ -57,11 +55,7 @@ describe('S3FileRepository', () => {
           acl: 'public-read',
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       const file = new File('file.txt', Buffer.from('hello'));
 
@@ -90,11 +84,7 @@ describe('S3FileRepository', () => {
           timeout: 1,
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       const file = new File('file.jpeg', Buffer.from('hello'));
 
@@ -121,11 +111,7 @@ describe('S3FileRepository', () => {
           acl: 'public-read',
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       const file = new File('file.jpeg', Buffer.from('hello'));
 
@@ -153,11 +139,7 @@ describe('S3FileRepository', () => {
           forcePathStyle: true,
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.get('test-file.txt');
@@ -186,11 +168,7 @@ describe('S3FileRepository', () => {
           acl: 'public-read',
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when, then
       await expect(() => s3FileRepository.get('test-file.txt')).rejects.toThrow(
@@ -216,11 +194,7 @@ describe('S3FileRepository', () => {
           timeout: 1,
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when, then
       await expect(() => s3FileRepository.get('test-file.txt')).rejects.toThrow(
@@ -245,11 +219,7 @@ describe('S3FileRepository', () => {
           acl: 'public-read',
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.get('test-file2.txt');
@@ -273,11 +243,7 @@ describe('S3FileRepository', () => {
           region: 'ap-northeast-2',
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.getUrl('test.txt');
@@ -302,11 +268,7 @@ describe('S3FileRepository', () => {
           endPoint: new URL('http://localhost:4566/test/test'),
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.getUrl('/path1/test.txt');
@@ -331,11 +293,7 @@ describe('S3FileRepository', () => {
           forcePathStyle: true,
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.getUrl('/path1/test.txt');
@@ -361,11 +319,7 @@ describe('S3FileRepository', () => {
           endPoint: new URL('http://localhost:4566/test/test'),
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.getUrl('/path1/test.txt');
@@ -391,11 +345,7 @@ describe('S3FileRepository', () => {
           region: 'ap-northeast-2',
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
       // when
       const result = await s3FileRepository.getSignedUrlForRead('test.txt');
 
@@ -424,11 +374,7 @@ describe('S3FileRepository', () => {
           forcePathStyle: true,
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
       // when
       const result = await s3FileRepository.getSignedUrlForRead('test.txt');
 
@@ -457,11 +403,7 @@ describe('S3FileRepository', () => {
           endPoint: new URL('http://localhost:4566/test/test'),
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.getSignedUrlForRead(
@@ -494,11 +436,7 @@ describe('S3FileRepository', () => {
           endPoint: new URL('http://localhost:4566/test/test'),
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.getSignedUrlForRead(
@@ -531,11 +469,7 @@ describe('S3FileRepository', () => {
           region: 'ap-northeast-2',
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
       // when
       const result = await s3FileRepository.getSignedUrlForUpload('test.txt');
 
@@ -564,11 +498,7 @@ describe('S3FileRepository', () => {
           forcePathStyle: true,
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
       // when
       const result = await s3FileRepository.getSignedUrlForUpload('test.txt');
 
@@ -597,11 +527,7 @@ describe('S3FileRepository', () => {
           endPoint: new URL('http://localhost:4566/test/test'),
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.getSignedUrlForUpload(
@@ -634,11 +560,7 @@ describe('S3FileRepository', () => {
           endPoint: new URL('http://localhost:4566/test/test'),
         },
       };
-      const s3FileRepository = new S3FileRepository(
-        config,
-        new DefaultS3UploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const s3FileRepository = createS3FileRepository(config);
 
       // when
       const result = await s3FileRepository.getSignedUrlForUpload(
@@ -657,3 +579,16 @@ describe('S3FileRepository', () => {
     });
   });
 });
+
+function createS3FileRepository(
+  config: S3FileRepositoryConfiguration,
+  optionFactory?: S3UploadOptionFactory,
+  errorHandler?: ErrorHandler,
+) {
+  return new S3FileRepository(
+    config,
+    optionFactory ?? new DefaultS3UploadOptionFactory(),
+    new FilePathResolver(config),
+    errorHandler ?? new DefaultS3ErrorHandler(config),
+  );
+}
