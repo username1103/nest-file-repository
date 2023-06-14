@@ -8,6 +8,7 @@ import { FileRepository } from './file-repository';
 import { FileRepositoryModule } from './file-repository.module';
 import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
 import { GCSFileRepository } from './gcs-file-repository/gcs-file-repository';
+import { ERROR_HANDLER } from './interface/error-handler';
 import {
   CONFIG,
   DiskFileRepositoryConfiguration,
@@ -26,8 +27,13 @@ import {
   S3UploadOptionFactory,
 } from './interface/s3-upload-option-factory';
 import { MemoryFileRepository } from './memory-file-repository/memory-file-repository';
+import { DefaultS3ErrorHandler } from './s3-file-repository/default-s3-error-handler';
 import { DefaultS3UploadOptionFactory } from './s3-file-repository/default-s3-upload-option-factory';
 import { S3FileRepository } from './s3-file-repository/s3-file-repository';
+import {
+  StubS3ErrorHandler,
+  StubS3FactoryHandler,
+} from './s3-file-repository/stub-s3-error-handler';
 import { UploadStrategy } from '../enum';
 import { File } from '../File';
 import { NAME_GENERATOR, NameGenerator } from '../interface/name-generator';
@@ -80,11 +86,13 @@ describe('FileRepositoryModule', () => {
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
+    const errorHandler = module.get(ERROR_HANDLER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(DefaultS3UploadOptionFactory);
+    expect(errorHandler).toBeInstanceOf(DefaultS3ErrorHandler);
     expect(config).toBe(s3Config);
   });
 
@@ -114,6 +122,7 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: Factory,
+        errorHandler: StubS3ErrorHandler,
       },
     };
     const module = await Test.createTestingModule({
@@ -125,11 +134,13 @@ describe('FileRepositoryModule', () => {
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
+    const errorHandler = module.get(ERROR_HANDLER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(errorHandler).toBeInstanceOf(StubS3ErrorHandler);
     expect(config).toBe(s3Config);
   });
 
@@ -159,6 +170,7 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: { useClass: Factory },
+        errorHandler: { useClass: StubS3ErrorHandler },
       },
     };
     const module = await Test.createTestingModule({
@@ -170,11 +182,13 @@ describe('FileRepositoryModule', () => {
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
+    const errorHandler = module.get(ERROR_HANDLER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(Factory);
+    expect(errorHandler).toBeInstanceOf(StubS3ErrorHandler);
     expect(config).toBe(s3Config);
   });
 
@@ -204,6 +218,7 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: { useValue: new Factory() },
+        errorHandler: { useValue: new StubS3ErrorHandler() },
       },
     };
 
@@ -265,6 +280,12 @@ describe('FileRepositoryModule', () => {
             new Factory(nameGenerator),
           inject: [NAME_GENERATOR],
         },
+        errorHandler: {
+          imports: [TestModule],
+          useFactory: (nameGenerator: NameGenerator) =>
+            new StubS3FactoryHandler(nameGenerator),
+          inject: [NAME_GENERATOR],
+        },
       },
     };
 
@@ -278,6 +299,7 @@ describe('FileRepositoryModule', () => {
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get<Factory>(S3_UPLOAD_OPTION_FACTORY);
     const testModule = module.get(TestModule);
+    const errorHandler = module.get<StubS3FactoryHandler>(ERROR_HANDLER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
@@ -287,6 +309,8 @@ describe('FileRepositoryModule', () => {
       IdentityNameGenerator,
     );
     expect(testModule).toBeInstanceOf(TestModule);
+    expect(errorHandler).toBeInstanceOf(StubS3FactoryHandler);
+    expect(errorHandler.nameGanerator).toBeInstanceOf(StubS3FactoryHandler);
     expect(config).toBe(s3Config);
   });
 

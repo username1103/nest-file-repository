@@ -1,3 +1,4 @@
+import { ErrorHandler } from './error-handler';
 import { GCSUploadOptionFactory } from './gcs-upload-option-factory';
 import { S3UploadOptionFactory } from './s3-upload-option-factory';
 import { UploadStrategy } from '../../enum';
@@ -66,6 +67,8 @@ export interface CommonOptions {
   timeout?: number;
 
   endPoint?: URL;
+
+  errorHandler?: CustomProvider<ErrorHandler>;
 }
 
 export interface CommonConfiguration {
