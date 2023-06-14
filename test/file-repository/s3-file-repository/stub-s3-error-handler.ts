@@ -5,7 +5,7 @@ import { NameGenerator } from '../../../lib/interface/name-generator';
 
 @Injectable()
 export class StubS3ErrorHandler implements ErrorHandler {
-  handle(e: unknown): any {
+  handle(e: unknown): never {
     throw e;
   }
 }
@@ -13,7 +13,7 @@ export class StubS3ErrorHandler implements ErrorHandler {
 @Injectable()
 export class StubS3ErrorHandlerInjectedNameGenerator implements ErrorHandler {
   constructor(readonly nameGenerator: NameGenerator) {}
-  handle(e: unknown): any {
+  handle(e: unknown): never {
     throw e;
   }
 }

@@ -18,13 +18,9 @@ export class DefaultS3ErrorHandler implements ErrorHandler {
     @Inject(CONFIG) private readonly config: S3FileRepositoryConfiguration,
   ) {}
 
-  handle(e: unknown): never | any {
+  handle(e: unknown): never {
     if (!(e instanceof Error)) {
       throw e;
-    }
-
-    if (e.name === 'NoSuchKey') {
-      return null;
     }
 
     if (e.name === 'TimeoutError') {

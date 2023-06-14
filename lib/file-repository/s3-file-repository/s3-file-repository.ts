@@ -88,6 +88,10 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
         response.ContentType,
       );
     } catch (e) {
+      if ((e as any)?.name === 'NoSuchKey') {
+        return null;
+      }
+
       return this.errorHandler.handle(e);
     }
   }
