@@ -4,8 +4,8 @@ import { NoSuchBucketException, TimeoutException } from '../../../lib';
 import { S3FileRepositoryConfiguration } from '../../../lib';
 import { DefaultS3UploadOptionFactory } from '../../../lib';
 import { FilePathResolver } from '../../../lib/file-repository/file-path-resolver';
-import { ErrorHandler } from '../../../lib/file-repository/interface/error-handler';
-import { DefaultS3ErrorHandler } from '../../../lib/file-repository/s3-file-repository/default-s3-error-handler';
+import { ErrorConverter } from '../../../lib/file-repository/interface/error-converter';
+import { DefaultS3ErrorConverter } from '../../../lib/file-repository/s3-file-repository/default-s3-error-converter';
 import { S3FileRepository } from '../../../lib/file-repository/s3-file-repository/s3-file-repository';
 import { expectNonNullable } from '../../expect/expect-non-nullable';
 
@@ -583,12 +583,12 @@ describe('S3FileRepository', () => {
 function createS3FileRepository(
   config: S3FileRepositoryConfiguration,
   optionFactory?: S3UploadOptionFactory,
-  errorHandler?: ErrorHandler,
+  errorHandler?: ErrorConverter,
 ) {
   return new S3FileRepository(
     config,
     optionFactory ?? new DefaultS3UploadOptionFactory(),
     new FilePathResolver(config),
-    errorHandler ?? new DefaultS3ErrorHandler(config),
+    errorHandler ?? new DefaultS3ErrorConverter(config),
   );
 }

@@ -11,7 +11,7 @@ import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
 import { FilePathResolver } from '../file-path-resolver';
 import { FileRepository } from '../file-repository';
-import { ERROR_HANDLER, ErrorHandler } from '../interface/error-handler';
+import { ERROR_CONVERTER, ErrorConverter } from '../interface/error-converter';
 import {
   CONFIG,
   S3FileRepositoryConfiguration,
@@ -30,7 +30,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
     @Inject(S3_UPLOAD_OPTION_FACTORY)
     private readonly s3UploadOptionFactory: S3UploadOptionFactory,
     private readonly filePathResolver: FilePathResolver,
-    @Inject(ERROR_HANDLER) private readonly errorHandler: ErrorHandler,
+    @Inject(ERROR_CONVERTER) private readonly errorHandler: ErrorConverter,
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
@@ -67,7 +67,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
         }),
       );
     } catch (e) {
-      return this.errorHandler.handle(e);
+      throw this.errorHandler.convert(e);
     }
 
     return key;
@@ -92,7 +92,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
         return null;
       }
 
-      return this.errorHandler.handle(e);
+      throw this.errorHandler.convert(e);
     }
   }
 

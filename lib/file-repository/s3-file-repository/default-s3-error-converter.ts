@@ -6,56 +6,63 @@ import {
   NotAllowedAclException,
   TimeoutException,
 } from '../exception';
-import { ErrorHandler } from '../interface/error-handler';
+import { BaseException } from '../exception/base-exception';
+import { UnexpectedException } from '../exception/unexpected.exception';
+import { ErrorConverter } from '../interface/error-converter';
 import {
   CONFIG,
   S3FileRepositoryConfiguration,
 } from '../interface/file-repository-configuration';
 
 @Injectable()
-export class DefaultS3ErrorHandler implements ErrorHandler {
+export class DefaultS3ErrorConverter implements ErrorConverter {
   constructor(
     @Inject(CONFIG) private readonly config: S3FileRepositoryConfiguration,
   ) {}
 
-  handle(e: unknown): never {
+  convert(e: unknown): BaseException {
     if (!(e instanceof Error)) {
-      throw e;
+      return new UnexpectedException(e);
     }
 
     if (e.name === 'TimeoutError') {
-      throw new TimeoutException(
+      return new TimeoutException(
         `raise timeout: ${this.config.options.timeout}ms`,
+        e,
       );
     }
 
     if (e.name === 'NoSuchBucket') {
-      throw new NoSuchBucketException(
+      return new NoSuchBucketException(
         `not exist bucket: ${this.config.options.bucket}`,
+        e,
       );
     }
 
     if (e.name === 'AccessControlListNotSupported') {
-      throw new NotAllowedAclException(
+      return new NotAllowedAclException(
         `not allowed acl: ${JSON.stringify({
           bucket: this.config.options.bucket,
           acl: this.config.options.acl,
         })}`,
+        e,
       );
     }
 
     if (e.name === 'InvalidAccessKeyId') {
-      throw new InvalidAccessKeyException(
+      return new InvalidAccessKeyException(
         `invalid accessKey Id: ${this.config.options.credentials.accessKeyId}`,
+        e,
       );
     }
 
     if (e.name === 'SignatureDoesNotMatch') {
-      throw new InvalidAccessKeyException(
+      return new InvalidAccessKeyException(
         `secretAccessKey does not matched: ${this.config.options.credentials.secretAccessKey}`,
+        e,
       );
     }
 
-    throw e;
+    return new UnexpectedException(e);
   }
 }

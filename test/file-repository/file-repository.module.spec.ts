@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
 import {
-  StubS3ErrorHandler,
-  StubS3ErrorHandlerInjectedNameGenerator,
-} from './s3-file-repository/stub-s3-error-handler';
+  StubS3ErrorConverter,
+  StubS3ErrorConverterInjectedNameGenerator,
+} from './s3-file-repository/stub-s3-error-converter';
 import {
   StubS3OptionFactory,
   StubS3OptionFactoryInjectedNameGenerator,
@@ -30,9 +30,9 @@ import { DiskFileRepository } from '../../lib/file-repository/disk-file-reposito
 import { FilePathResolver } from '../../lib/file-repository/file-path-resolver';
 import { DefaultGCSUploadOptionFactory } from '../../lib/file-repository/gcs-file-repository/default-gcs-upload-option-factory';
 import { GCSFileRepository } from '../../lib/file-repository/gcs-file-repository/gcs-file-repository';
-import { ERROR_HANDLER } from '../../lib/file-repository/interface/error-handler';
+import { ERROR_CONVERTER } from '../../lib/file-repository/interface/error-converter';
 import { MemoryFileRepository } from '../../lib/file-repository/memory-file-repository/memory-file-repository';
-import { DefaultS3ErrorHandler } from '../../lib/file-repository/s3-file-repository/default-s3-error-handler';
+import { DefaultS3ErrorConverter } from '../../lib/file-repository/s3-file-repository/default-s3-error-converter';
 import { S3FileRepository } from '../../lib/file-repository/s3-file-repository/s3-file-repository';
 import {
   NAME_GENERATOR,
@@ -87,13 +87,13 @@ describe('FileRepositoryModule', () => {
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
-    const errorHandler = module.get(ERROR_HANDLER);
+    const errorHandler = module.get(ERROR_CONVERTER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(DefaultS3UploadOptionFactory);
-    expect(errorHandler).toBeInstanceOf(DefaultS3ErrorHandler);
+    expect(errorHandler).toBeInstanceOf(DefaultS3ErrorConverter);
     expect(config).toBe(s3Config);
   });
 
@@ -110,7 +110,7 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: StubS3OptionFactory,
-        errorHandler: StubS3ErrorHandler,
+        errorHandler: StubS3ErrorConverter,
       },
     };
     const module = await Test.createTestingModule({
@@ -122,13 +122,13 @@ describe('FileRepositoryModule', () => {
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
-    const errorHandler = module.get(ERROR_HANDLER);
+    const errorHandler = module.get(ERROR_CONVERTER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(StubS3OptionFactory);
-    expect(errorHandler).toBeInstanceOf(StubS3ErrorHandler);
+    expect(errorHandler).toBeInstanceOf(StubS3ErrorConverter);
     expect(config).toBe(s3Config);
   });
 
@@ -145,7 +145,7 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: { useClass: StubS3OptionFactory },
-        errorHandler: { useClass: StubS3ErrorHandler },
+        errorHandler: { useClass: StubS3ErrorConverter },
       },
     };
     const module = await Test.createTestingModule({
@@ -157,13 +157,13 @@ describe('FileRepositoryModule', () => {
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const s3UploadOptionFactory = module.get(S3_UPLOAD_OPTION_FACTORY);
-    const errorHandler = module.get(ERROR_HANDLER);
+    const errorHandler = module.get(ERROR_CONVERTER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(StubS3OptionFactory);
-    expect(errorHandler).toBeInstanceOf(StubS3ErrorHandler);
+    expect(errorHandler).toBeInstanceOf(StubS3ErrorConverter);
     expect(config).toBe(s3Config);
   });
 
@@ -180,7 +180,7 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: { useValue: new StubS3OptionFactory() },
-        errorHandler: { useValue: new StubS3ErrorHandler() },
+        errorHandler: { useValue: new StubS3ErrorConverter() },
       },
     };
 
@@ -231,7 +231,7 @@ describe('FileRepositoryModule', () => {
         errorHandler: {
           imports: [TestModule],
           useFactory: (nameGenerator: NameGenerator) =>
-            new StubS3ErrorHandlerInjectedNameGenerator(nameGenerator),
+            new StubS3ErrorConverterInjectedNameGenerator(nameGenerator),
           inject: [NAME_GENERATOR],
         },
       },
@@ -251,7 +251,7 @@ describe('FileRepositoryModule', () => {
       );
     const testModule = module.get(TestModule);
     const errorHandler =
-      module.get<StubS3ErrorHandlerInjectedNameGenerator>(ERROR_HANDLER);
+      module.get<StubS3ErrorConverterInjectedNameGenerator>(ERROR_CONVERTER);
 
     // then
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
@@ -264,7 +264,7 @@ describe('FileRepositoryModule', () => {
     );
     expect(testModule).toBeInstanceOf(TestModule);
     expect(errorHandler).toBeInstanceOf(
-      StubS3ErrorHandlerInjectedNameGenerator,
+      StubS3ErrorConverterInjectedNameGenerator,
     );
     expect(errorHandler.nameGenerator).toBeInstanceOf(IdentityNameGenerator);
     expect(config).toBe(s3Config);

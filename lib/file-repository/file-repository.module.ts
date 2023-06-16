@@ -8,14 +8,14 @@ import { FilePathResolver } from './file-path-resolver';
 import { FileRepository } from './file-repository';
 import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
 import { getFileRepository } from './get-file-repository';
-import { ERROR_HANDLER } from './interface/error-handler';
+import { ERROR_CONVERTER } from './interface/error-converter';
 import {
   CONFIG,
   FileRepositoryConfiguration,
 } from './interface/file-repository-configuration';
 import { GCS_UPLOAD_OPTION_FACTORY } from './interface/gcs-upload-option-factory';
 import { S3_UPLOAD_OPTION_FACTORY } from './interface/s3-upload-option-factory';
-import { DefaultS3ErrorHandler } from './s3-file-repository/default-s3-error-handler';
+import { DefaultS3ErrorConverter } from './s3-file-repository/default-s3-error-converter';
 import { DefaultS3UploadOptionFactory } from './s3-file-repository/default-s3-upload-option-factory';
 import { UploadStrategy } from '../enum';
 import {
@@ -54,8 +54,8 @@ export class FileRepositoryModule {
           config.options.uploadOptionFactory ?? DefaultS3UploadOptionFactory,
         ),
         ...this.getCustomProvider(
-          ERROR_HANDLER,
-          config.options.errorHandler ?? DefaultS3ErrorHandler,
+          ERROR_CONVERTER,
+          config.options.errorHandler ?? DefaultS3ErrorConverter,
         ),
       );
 

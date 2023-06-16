@@ -5,13 +5,14 @@ import {
   TimeoutException,
   UploadStrategy,
 } from '../../../lib';
-import { DefaultS3ErrorHandler } from '../../../lib/file-repository/s3-file-repository/default-s3-error-handler';
+import { UnexpectedException } from '../../../lib/file-repository/exception/unexpected.exception';
+import { DefaultS3ErrorConverter } from '../../../lib/file-repository/s3-file-repository/default-s3-error-converter';
 
-describe('DefaultS3ErrorHandler', () => {
-  it('throw value if is not error', async () => {
+describe('DefaultS3ErrorConverter', () => {
+  it('return UnexpectedException if is not error', async () => {
     // given
     const e = 'error';
-    const errorHandler = new DefaultS3ErrorHandler({
+    const errorConverter = new DefaultS3ErrorConverter({
       strategy: UploadStrategy.S3,
       options: {
         region: 'string',
@@ -23,15 +24,18 @@ describe('DefaultS3ErrorHandler', () => {
       },
     });
 
-    // when, then
-    expect(() => errorHandler.handle(e)).toThrow('error');
+    // when
+    const exception = errorConverter.convert(e);
+
+    // then
+    expect(exception).toBeInstanceOf(UnexpectedException);
   });
 
-  it('throw TimeoutException if get TimeoutError', async () => {
+  it('return TimeoutException if get TimeoutError', async () => {
     // given
     const e = new Error();
     e.name = 'TimeoutError';
-    const errorHandler = new DefaultS3ErrorHandler({
+    const errorConverter = new DefaultS3ErrorConverter({
       strategy: UploadStrategy.S3,
       options: {
         region: 'string',
@@ -43,15 +47,18 @@ describe('DefaultS3ErrorHandler', () => {
       },
     });
 
-    // when, then
-    expect(() => errorHandler.handle(e)).toThrow(TimeoutException);
+    // when
+    const exception = errorConverter.convert(e);
+
+    // then
+    expect(exception).toBeInstanceOf(TimeoutException);
   });
 
-  it('throw NoSuchBucketException if get NoSuchBucket Error', async () => {
+  it('return NoSuchBucketException if get NoSuchBucket Error', async () => {
     // given
     const e = new Error();
     e.name = 'NoSuchBucket';
-    const errorHandler = new DefaultS3ErrorHandler({
+    const errorConverter = new DefaultS3ErrorConverter({
       strategy: UploadStrategy.S3,
       options: {
         region: 'string',
@@ -63,15 +70,18 @@ describe('DefaultS3ErrorHandler', () => {
       },
     });
 
-    // when, then
-    expect(() => errorHandler.handle(e)).toThrow(NoSuchBucketException);
+    // when
+    const exception = errorConverter.convert(e);
+
+    // then
+    expect(exception).toBeInstanceOf(NoSuchBucketException);
   });
 
-  it('throw NotAllowedAclException if get AccessControlListNotSupported Error', async () => {
+  it('return NotAllowedAclException if get AccessControlListNotSupported Error', async () => {
     // given
     const e = new Error();
     e.name = 'AccessControlListNotSupported';
-    const errorHandler = new DefaultS3ErrorHandler({
+    const errorConverter = new DefaultS3ErrorConverter({
       strategy: UploadStrategy.S3,
       options: {
         region: 'string',
@@ -83,15 +93,18 @@ describe('DefaultS3ErrorHandler', () => {
       },
     });
 
-    // when, then
-    expect(() => errorHandler.handle(e)).toThrow(NotAllowedAclException);
+    // when
+    const exception = errorConverter.convert(e);
+
+    // then
+    expect(exception).toBeInstanceOf(NotAllowedAclException);
   });
 
-  it('throw InvalidAccessKeyException if get InvalidAccessKeyId Error', async () => {
+  it('return InvalidAccessKeyException if get InvalidAccessKeyId Error', async () => {
     // given
     const e = new Error();
     e.name = 'InvalidAccessKeyId';
-    const errorHandler = new DefaultS3ErrorHandler({
+    const errorConverter = new DefaultS3ErrorConverter({
       strategy: UploadStrategy.S3,
       options: {
         region: 'string',
@@ -103,15 +116,18 @@ describe('DefaultS3ErrorHandler', () => {
       },
     });
 
-    // when, then
-    expect(() => errorHandler.handle(e)).toThrow(InvalidAccessKeyException);
+    // when
+    const exception = errorConverter.convert(e);
+
+    // then
+    expect(exception).toBeInstanceOf(InvalidAccessKeyException);
   });
 
-  it('throw InvalidAccessKeyException if get SignatureDoesNotMatch Error', async () => {
+  it('return InvalidAccessKeyException if get SignatureDoesNotMatch Error', async () => {
     // given
     const e = new Error();
     e.name = 'SignatureDoesNotMatch';
-    const errorHandler = new DefaultS3ErrorHandler({
+    const errorConverter = new DefaultS3ErrorConverter({
       strategy: UploadStrategy.S3,
       options: {
         region: 'string',
@@ -123,7 +139,10 @@ describe('DefaultS3ErrorHandler', () => {
       },
     });
 
+    // when
+    const exception = errorConverter.convert(e);
+
     // when, then
-    expect(() => errorHandler.handle(e)).toThrow(InvalidAccessKeyException);
+    expect(exception).toBeInstanceOf(InvalidAccessKeyException);
   });
 });

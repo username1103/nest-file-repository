@@ -48,6 +48,7 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
       if ((e as any).name === 'AbortError') {
         throw new TimeoutException(
           `raise timeout: ${this.config.options?.timeout}ms`,
+          e,
         );
       }
 
@@ -93,6 +94,7 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
       if ((e as any).name === 'AbortError') {
         throw new TimeoutException(
           `raise timeout: ${this.config.options?.timeout}ms`,
+          e,
         );
       }
 

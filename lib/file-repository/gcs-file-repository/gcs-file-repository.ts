@@ -63,6 +63,7 @@ export class GCSFileRepository implements FileRepository {
       if ((e as any).code === 'ERR_OSSL_UNSUPPORTED') {
         throw new InvalidAccessKeyException(
           `invalid access key: ${this.config.options.keyFile}`,
+          e,
         );
       }
 
@@ -110,6 +111,7 @@ export class GCSFileRepository implements FileRepository {
       if ((e as any).code === 'ERR_OSSL_UNSUPPORTED') {
         throw new InvalidAccessKeyException(
           `invalid access key: ${this.config.options.keyFile}`,
+          e,
         );
       }
 
