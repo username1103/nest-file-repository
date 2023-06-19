@@ -30,7 +30,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
     @Inject(S3_UPLOAD_OPTION_FACTORY)
     private readonly s3UploadOptionFactory: S3UploadOptionFactory,
     private readonly filePathResolver: FilePathResolver,
-    @Inject(ERROR_CONVERTER) private readonly errorHandler: ErrorConverter,
+    @Inject(ERROR_CONVERTER) private readonly errorConverter: ErrorConverter,
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
@@ -67,7 +67,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
         }),
       );
     } catch (e) {
-      throw this.errorHandler.convert(e);
+      throw this.errorConverter.convert(e);
     }
 
     return key;
@@ -92,7 +92,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
         return null;
       }
 
-      throw this.errorHandler.convert(e);
+      throw this.errorConverter.convert(e);
     }
   }
 

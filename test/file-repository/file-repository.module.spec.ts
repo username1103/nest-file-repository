@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
-import {
-  StubS3ErrorConverter,
-  StubS3ErrorConverterInjectedNameGenerator,
-} from './s3-file-repository/stub-s3-error-converter';
+import { StubS3ErrorConverterInjectedNameGenerator } from './s3-file-repository/stub-s3-error-converter';
 import {
   StubS3OptionFactory,
   StubS3OptionFactoryInjectedNameGenerator,
@@ -28,6 +25,7 @@ import {
 } from '../../lib';
 import { DiskFileRepository } from '../../lib/file-repository/disk-file-repository/disk-file-repository';
 import { FilePathResolver } from '../../lib/file-repository/file-path-resolver';
+import { DefaultGCSErrorConverter } from '../../lib/file-repository/gcs-file-repository/default-gcs-error-converter';
 import { DefaultGCSUploadOptionFactory } from '../../lib/file-repository/gcs-file-repository/default-gcs-upload-option-factory';
 import { GCSFileRepository } from '../../lib/file-repository/gcs-file-repository/gcs-file-repository';
 import { ERROR_CONVERTER } from '../../lib/file-repository/interface/error-converter';
@@ -110,7 +108,6 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: StubS3OptionFactory,
-        errorHandler: StubS3ErrorConverter,
       },
     };
     const module = await Test.createTestingModule({
@@ -128,7 +125,7 @@ describe('FileRepositoryModule', () => {
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(StubS3OptionFactory);
-    expect(errorHandler).toBeInstanceOf(StubS3ErrorConverter);
+    expect(errorHandler).toBeInstanceOf(DefaultS3ErrorConverter);
     expect(config).toBe(s3Config);
   });
 
@@ -145,7 +142,6 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: { useClass: StubS3OptionFactory },
-        errorHandler: { useClass: StubS3ErrorConverter },
       },
     };
     const module = await Test.createTestingModule({
@@ -163,7 +159,7 @@ describe('FileRepositoryModule', () => {
     expect(fileRepository).toBeInstanceOf(S3FileRepository);
     expect(aliasFileRepository).toBeInstanceOf(S3FileRepository);
     expect(s3UploadOptionFactory).toBeInstanceOf(StubS3OptionFactory);
-    expect(errorHandler).toBeInstanceOf(StubS3ErrorConverter);
+    expect(errorHandler).toBeInstanceOf(DefaultS3ErrorConverter);
     expect(config).toBe(s3Config);
   });
 
@@ -180,7 +176,6 @@ describe('FileRepositoryModule', () => {
         bucket: 'test',
         region: 'test',
         uploadOptionFactory: { useValue: new StubS3OptionFactory() },
-        errorHandler: { useValue: new StubS3ErrorConverter() },
       },
     };
 
@@ -228,12 +223,6 @@ describe('FileRepositoryModule', () => {
             new StubS3OptionFactoryInjectedNameGenerator(nameGenerator),
           inject: [NAME_GENERATOR],
         },
-        errorHandler: {
-          imports: [TestModule],
-          useFactory: (nameGenerator: NameGenerator) =>
-            new StubS3ErrorConverterInjectedNameGenerator(nameGenerator),
-          inject: [NAME_GENERATOR],
-        },
       },
     };
 
@@ -263,10 +252,7 @@ describe('FileRepositoryModule', () => {
       IdentityNameGenerator,
     );
     expect(testModule).toBeInstanceOf(TestModule);
-    expect(errorHandler).toBeInstanceOf(
-      StubS3ErrorConverterInjectedNameGenerator,
-    );
-    expect(errorHandler.nameGenerator).toBeInstanceOf(IdentityNameGenerator);
+    expect(errorHandler).toBeInstanceOf(DefaultS3ErrorConverter);
     expect(config).toBe(s3Config);
   });
 
@@ -287,6 +273,7 @@ describe('FileRepositoryModule', () => {
     const config = module.get(CONFIG);
     const aliasFileRepository = module.get(DEFAULT_ALIAS);
     const gcsUploadOptionFactory = module.get(GCS_UPLOAD_OPTION_FACTORY);
+    const errorConverter = module.get(ERROR_CONVERTER);
 
     // then
     expect(fileRepository).toBeInstanceOf(GCSFileRepository);
@@ -294,6 +281,7 @@ describe('FileRepositoryModule', () => {
     expect(gcsUploadOptionFactory).toBeInstanceOf(
       DefaultGCSUploadOptionFactory,
     );
+    expect(errorConverter).toBeInstanceOf(DefaultGCSErrorConverter);
     expect(config).toBe(gcsConfig);
   });
 

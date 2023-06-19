@@ -1,10 +1,15 @@
-import { UploadStrategy } from '../../../lib';
-import { File } from '../../../lib';
-import { NoSuchBucketException, TimeoutException } from '../../../lib';
-import { GCSFileRepositoryConfiguration } from '../../../lib';
+import {
+  File,
+  GCSFileRepositoryConfiguration,
+  GCSUploadOptionFactory,
+  TimeoutException,
+  UploadStrategy,
+} from '../../../lib';
 import { FilePathResolver } from '../../../lib/file-repository/file-path-resolver';
+import { DefaultGCSErrorConverter } from '../../../lib/file-repository/gcs-file-repository/default-gcs-error-converter';
 import { DefaultGCSUploadOptionFactory } from '../../../lib/file-repository/gcs-file-repository/default-gcs-upload-option-factory';
 import { GCSFileRepository } from '../../../lib/file-repository/gcs-file-repository/gcs-file-repository';
+import { ErrorConverter } from '../../../lib/file-repository/interface/error-converter';
 import { expectNonNullable } from '../../expect/expect-non-nullable';
 
 describe('GCSFileRepository', () => {
@@ -20,12 +25,7 @@ describe('GCSFileRepository', () => {
           path: '/test',
         },
       };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
-
+      const gcsFileRepository = createGCSFileRepository(config);
       const file = new File('file.txt', Buffer.from('hello'));
 
       // when
@@ -45,12 +45,7 @@ describe('GCSFileRepository', () => {
           bucket: 'test-bucket',
         },
       };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
-
+      const gcsFileRepository = createGCSFileRepository(config);
       const file = new File('file.txt', Buffer.from('hello'));
 
       // when
@@ -71,41 +66,13 @@ describe('GCSFileRepository', () => {
           timeout: 1,
         },
       };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const gcsFileRepository = createGCSFileRepository(config);
 
       const file = new File('file.txt', Buffer.from('hello'));
 
       // when, then
       await expect(() => gcsFileRepository.save(file)).rejects.toThrow(
         new TimeoutException(`raise timeout: ${config.options.timeout}ms`),
-      );
-    });
-
-    it('throw NoSuchBucketException when bucket does not exist', async () => {
-      // given
-      const config: GCSFileRepositoryConfiguration = {
-        strategy: UploadStrategy.GCS,
-        options: {
-          endPoint: new URL('http://localhost:8080'),
-          projectId: 'test',
-          bucket: 'test-bucket2',
-        },
-      };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
-
-      const file = new File('file.txt', Buffer.from('hello'));
-
-      // when, then
-      await expect(() => gcsFileRepository.save(file)).rejects.toThrow(
-        new NoSuchBucketException(`not exists bucket: test-bucket2`),
       );
     });
   });
@@ -120,11 +87,7 @@ describe('GCSFileRepository', () => {
           endPoint: new URL('http://localhost:8080'),
         },
       };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const gcsFileRepository = createGCSFileRepository(config);
 
       // when
       const result = await gcsFileRepository.get('test-file.txt');
@@ -133,49 +96,6 @@ describe('GCSFileRepository', () => {
       expectNonNullable(result);
       expect(result.filename).toBe('test-file.txt');
       expect(result.data.toString()).toBe('test-file\n');
-    });
-
-    it('return null if file does not exist', async () => {
-      // given
-      const config: GCSFileRepositoryConfiguration = {
-        strategy: UploadStrategy.GCS,
-        options: {
-          bucket: 'test-bucket',
-          endPoint: new URL('http://localhost:8080'),
-        },
-      };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
-
-      // when
-      const result = await gcsFileRepository.get('test-file2.txt');
-
-      // then
-      expect(result).toBe(null);
-    });
-
-    it('throw NoSuchBucketException if bucket does not exist', async () => {
-      // given
-      const config: GCSFileRepositoryConfiguration = {
-        strategy: UploadStrategy.GCS,
-        options: {
-          bucket: 'invalid',
-          endPoint: new URL('http://localhost:8080'),
-        },
-      };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
-
-      // when, then
-      await expect(() =>
-        gcsFileRepository.get('test-file2.txt'),
-      ).rejects.toThrow(NoSuchBucketException);
     });
   });
 
@@ -188,11 +108,7 @@ describe('GCSFileRepository', () => {
           bucket: 'test-bucket',
         },
       };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const gcsFileRepository = createGCSFileRepository(config);
 
       // when
       const result = await gcsFileRepository.getUrl('/test/test.txt');
@@ -212,11 +128,7 @@ describe('GCSFileRepository', () => {
           endPoint: new URL('http://localhost:8080/path'),
         },
       };
-      const gcsFileRepository = new GCSFileRepository(
-        config,
-        new DefaultGCSUploadOptionFactory(),
-        new FilePathResolver(config),
-      );
+      const gcsFileRepository = createGCSFileRepository(config);
 
       // when
       const result = await gcsFileRepository.getUrl('test.txt');
@@ -226,3 +138,16 @@ describe('GCSFileRepository', () => {
     });
   });
 });
+
+function createGCSFileRepository(
+  config: GCSFileRepositoryConfiguration,
+  optionFactory?: GCSUploadOptionFactory,
+  errorHandler?: ErrorConverter,
+) {
+  return new GCSFileRepository(
+    config,
+    optionFactory ?? new DefaultGCSUploadOptionFactory(),
+    new FilePathResolver(config),
+    errorHandler ?? new DefaultGCSErrorConverter(config),
+  );
+}

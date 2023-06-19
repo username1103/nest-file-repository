@@ -7,6 +7,8 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
 import { TimeoutException } from '../exception';
+import { BaseException } from '../exception/base-exception';
+import { UnexpectedException } from '../exception/unexpected.exception';
 import { FilePathResolver } from '../file-path-resolver';
 import { FileRepository } from '../file-repository';
 import {
@@ -52,7 +54,7 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
         );
       }
 
-      throw e;
+      throw new UnexpectedException(e);
     }
 
     return key;
@@ -87,6 +89,10 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
           : fileContents,
       );
     } catch (e) {
+      if (e instanceof BaseException) {
+        throw e;
+      }
+
       if ((e as any)?.code === 'ENOENT') {
         return null;
       }
@@ -98,7 +104,7 @@ export class DiskFileRepository implements FileRepository, OnModuleInit {
         );
       }
 
-      throw e;
+      throw new UnexpectedException(e);
     }
   }
 
