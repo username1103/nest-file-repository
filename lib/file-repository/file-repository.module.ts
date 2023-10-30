@@ -6,14 +6,17 @@ import { Type } from '@nestjs/common/interfaces/type.interface';
 import { DEFAULT_ALIAS } from './constant';
 import { FilePathResolver } from './file-path-resolver';
 import { FileRepository } from './file-repository';
+import { DefaultGCSErrorConverter } from './gcs-file-repository/default-gcs-error-converter';
 import { DefaultGCSUploadOptionFactory } from './gcs-file-repository/default-gcs-upload-option-factory';
 import { getFileRepository } from './get-file-repository';
+import { ERROR_CONVERTER } from './interface/error-converter';
 import {
   CONFIG,
   FileRepositoryConfiguration,
 } from './interface/file-repository-configuration';
 import { GCS_UPLOAD_OPTION_FACTORY } from './interface/gcs-upload-option-factory';
 import { S3_UPLOAD_OPTION_FACTORY } from './interface/s3-upload-option-factory';
+import { DefaultS3ErrorConverter } from './s3-file-repository/default-s3-error-converter';
 import { DefaultS3UploadOptionFactory } from './s3-file-repository/default-s3-upload-option-factory';
 import { UploadStrategy } from '../enum';
 import {
@@ -51,6 +54,10 @@ export class FileRepositoryModule {
           S3_UPLOAD_OPTION_FACTORY,
           config.options.uploadOptionFactory ?? DefaultS3UploadOptionFactory,
         ),
+        {
+          provide: ERROR_CONVERTER,
+          useClass: DefaultS3ErrorConverter,
+        },
       );
 
       if (
@@ -67,6 +74,10 @@ export class FileRepositoryModule {
           GCS_UPLOAD_OPTION_FACTORY,
           config.options.uploadOptionFactory ?? DefaultGCSUploadOptionFactory,
         ),
+        {
+          provide: ERROR_CONVERTER,
+          useClass: DefaultGCSErrorConverter,
+        },
       );
 
       if (

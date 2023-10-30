@@ -4,13 +4,9 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
-import {
-  InvalidAccessKeyException,
-  NoSuchBucketException,
-  TimeoutException,
-} from '../exception';
 import { FilePathResolver } from '../file-path-resolver';
 import { FileRepository } from '../file-repository';
+import { ERROR_CONVERTER, ErrorConverter } from '../interface/error-converter';
 import {
   CONFIG,
   GCSFileRepositoryConfiguration,
@@ -29,6 +25,7 @@ export class GCSFileRepository implements FileRepository {
     @Inject(GCS_UPLOAD_OPTION_FACTORY)
     private readonly uploadOptionFactory: GCSUploadOptionFactory,
     private readonly filePathResolver: FilePathResolver,
+    @Inject(ERROR_CONVERTER) private readonly errorConverter: ErrorConverter,
   ) {
     this.client = new Storage({
       keyFilename: this.config.options.keyFile,
@@ -56,43 +53,7 @@ export class GCSFileRepository implements FileRepository {
           predefinedAcl: options.acl,
         });
     } catch (e) {
-      if (!(e instanceof Error)) {
-        throw e;
-      }
-
-      if ((e as any).code === 'ERR_OSSL_UNSUPPORTED') {
-        throw new InvalidAccessKeyException(
-          `invalid access key: ${this.config.options.keyFile}`,
-        );
-      }
-
-      if (e.name === 'FetchError' && (e as any).type === 'request-timeout') {
-        throw new TimeoutException(
-          `raise timeout: ${this.config.options.timeout}ms`,
-        );
-      }
-
-      if (
-        e instanceof ApiError &&
-        e.code === 404 &&
-        e.message.includes('The specified bucket does not exist')
-      ) {
-        throw new NoSuchBucketException(
-          `not exists bucket: ${this.config.options.bucket}`,
-        );
-      }
-
-      if (
-        e instanceof ApiError &&
-        e.code === 404 &&
-        !(await this.client.bucket(options.bucket).exists())[0]
-      ) {
-        throw new NoSuchBucketException(
-          `not exists bucket: ${this.config.options.bucket}`,
-        );
-      }
-
-      throw e;
+      throw this.errorConverter.convert(e);
     }
 
     return filePath;
@@ -107,12 +68,6 @@ export class GCSFileRepository implements FileRepository {
 
       return new File(key, result);
     } catch (e) {
-      if ((e as any).code === 'ERR_OSSL_UNSUPPORTED') {
-        throw new InvalidAccessKeyException(
-          `invalid access key: ${this.config.options.keyFile}`,
-        );
-      }
-
       if (
         e instanceof ApiError &&
         e.code === 404 &&
@@ -121,33 +76,7 @@ export class GCSFileRepository implements FileRepository {
         return null;
       }
 
-      if (
-        e instanceof ApiError &&
-        e.code === 404 &&
-        e.message.includes('The specified bucket does not exist')
-      ) {
-        throw new NoSuchBucketException(
-          `not exists bucket: ${this.config.options.bucket}`,
-        );
-      }
-
-      /**
-       * for fake-gcs-server error handling
-       * https://github.com/fsouza/fake-gcs-server/issues/1187
-       */
-      if (e instanceof ApiError && e.code === 404) {
-        if (
-          (await this.client.bucket(this.config.options.bucket).exists())[0]
-        ) {
-          return null;
-        }
-
-        throw new NoSuchBucketException(
-          `not exists bucket: ${this.config.options.bucket}`,
-        );
-      }
-
-      throw e;
+      throw this.errorConverter.convert(e);
     }
   }
 

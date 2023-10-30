@@ -6,11 +6,11 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  rootDir: 'lib',
-  coverageDirectory: '../coverage',
+  rootDir: '.',
+  coverageDirectory: 'coverage',
   coverageReporters: ['lcov'],
   collectCoverageFrom: ['**/*.(t|j)s', '!**/*.spec.ts'],
-  setupFiles: ['../jest.setup.ts'],
+  setupFiles: ['./jest.setup.ts'],
 };
 
 export default config;

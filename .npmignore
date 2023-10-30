@@ -17,3 +17,4 @@ jest.setup.ts
 tsconfig.json
 sonar-project.properties
 test-bucket
+/test

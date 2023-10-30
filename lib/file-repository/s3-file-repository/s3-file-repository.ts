@@ -9,14 +9,9 @@ import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 
 import { File } from '../../File';
 import { normalizePath } from '../../util/shared.util';
-import {
-  InvalidAccessKeyException,
-  NoSuchBucketException,
-  NotAllowedAclException,
-  TimeoutException,
-} from '../exception';
 import { FilePathResolver } from '../file-path-resolver';
 import { FileRepository } from '../file-repository';
+import { ERROR_CONVERTER, ErrorConverter } from '../interface/error-converter';
 import {
   CONFIG,
   S3FileRepositoryConfiguration,
@@ -35,6 +30,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
     @Inject(S3_UPLOAD_OPTION_FACTORY)
     private readonly s3UploadOptionFactory: S3UploadOptionFactory,
     private readonly filePathResolver: FilePathResolver,
+    @Inject(ERROR_CONVERTER) private readonly errorConverter: ErrorConverter,
   ) {
     this.client = new S3Client({
       region: this.config.options.region,
@@ -71,44 +67,7 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
         }),
       );
     } catch (e) {
-      if (!(e instanceof Error)) {
-        throw e;
-      }
-
-      if (e.name === 'TimeoutError') {
-        throw new TimeoutException(
-          `raise timeout: ${this.config.options.timeout}ms`,
-        );
-      }
-
-      if (e.name === 'NoSuchBucket') {
-        throw new NoSuchBucketException(
-          `not exist bucket: ${this.config.options.bucket}`,
-        );
-      }
-
-      if (e.name === 'AccessControlListNotSupported') {
-        throw new NotAllowedAclException(
-          `not allowed acl: ${JSON.stringify({
-            bucket: this.config.options.bucket,
-            acl: this.config.options.acl,
-          })}`,
-        );
-      }
-
-      if (e.name === 'InvalidAccessKeyId') {
-        throw new InvalidAccessKeyException(
-          `invalid accessKey Id: ${this.config.options.credentials.accessKeyId}`,
-        );
-      }
-
-      if (e.name === 'SignatureDoesNotMatch') {
-        throw new InvalidAccessKeyException(
-          `secretAccessKey does not matched: ${this.config.options.credentials.secretAccessKey}`,
-        );
-      }
-
-      throw e;
+      throw this.errorConverter.convert(e);
     }
 
     return key;
@@ -129,39 +88,11 @@ export class S3FileRepository implements FileRepository, OnModuleDestroy {
         response.ContentType,
       );
     } catch (e) {
-      if (!(e instanceof Error)) {
-        throw e;
-      }
-
-      if (e.name === 'NoSuchKey') {
+      if ((e as any)?.name === 'NoSuchKey') {
         return null;
       }
 
-      if (e.name === 'TimeoutError') {
-        throw new TimeoutException(
-          `raise timeout: ${this.config.options.timeout}ms`,
-        );
-      }
-
-      if (e.name === 'NoSuchBucket') {
-        throw new NoSuchBucketException(
-          `not exist bucket: ${this.config.options.bucket}`,
-        );
-      }
-
-      if (e.name === 'InvalidAccessKeyId') {
-        throw new InvalidAccessKeyException(
-          `invalid accessKey Id: ${this.config.options.credentials.accessKeyId}`,
-        );
-      }
-
-      if (e.name === 'SignatureDoesNotMatch') {
-        throw new InvalidAccessKeyException(
-          `secretAccessKey does not matched: ${this.config.options.credentials.secretAccessKey}`,
-        );
-      }
-
-      throw e;
+      throw this.errorConverter.convert(e);
     }
   }
 
